@@ -16,6 +16,7 @@ This backend service allows you to:
    - GPT model deployment
 
 2. Set up your configuration:
+   ```bash
    {
    "AzureOpenAI":
       {
@@ -24,6 +25,7 @@ This backend service allows you to:
          "DeploymentName": "<your-deployment-name>"
       }
    }
+   ```
 
 3. Run the application:
    ```bash
