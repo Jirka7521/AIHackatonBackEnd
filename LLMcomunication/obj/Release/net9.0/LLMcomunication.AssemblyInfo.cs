@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LLMcomunication")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4729e04908580559789307a8abef898cab306629")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a4904315d2cc3daeb21e4c52a03b53c2d2795a8b")]
 [assembly: System.Reflection.AssemblyProductAttribute("LLMcomunication")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LLMcomunication")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
