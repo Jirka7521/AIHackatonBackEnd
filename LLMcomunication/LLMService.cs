@@ -1,3 +1,9 @@
+// File: LLMService.cs
+// Description: Provides functionality to communicate with Azure OpenAI service using a streaming chat interface.
+// It sets up the configuration, initializes the chat client, and handles the conversation with a user.
+//
+// Author: [Your Name]
+// Date: [Current Date]
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,11 +14,13 @@ using Azure.AI.OpenAI;
 
 namespace LLMcomunication
 {
+    // LLMService encapsulates communication with the Azure OpenAI chat service.
     public class LLMService
     {
         private readonly ChatClient _chatClient;
         public List<ChatMessage> Conversation { get; private set; }
 
+        // Constructor initializes configuration, validates settings, and sets up the chat client.
         public LLMService()
         {
             // Build configuration from appsettings.json.
@@ -31,15 +39,17 @@ namespace LLMcomunication
                 string.IsNullOrWhiteSpace(apiKey) ||
                 string.IsNullOrWhiteSpace(deploymentName))
             {
+                // Throw exception if any configuration value is missing.
                 throw new Exception("Missing configuration values. Please set AzureOpenAI:Endpoint, AzureOpenAI:ApiKey, and AzureOpenAI:DeploymentName in appsettings.json.");
             }
 
+            // Validate that the endpoint is a valid URI.
             if (!Uri.TryCreate(endpointStr, UriKind.Absolute, out var endpoint))
             {
                 throw new Exception("The provided endpoint is not a valid URI.");
             }
 
-            // Initialize the Azure OpenAI client.
+            // Initialize the Azure OpenAI client with the given endpoint and API key.
             AzureOpenAIClient azureClient = new AzureOpenAIClient(endpoint, new AzureKeyCredential(apiKey));
             _chatClient = azureClient.GetChatClient(deploymentName);
 
@@ -50,7 +60,7 @@ namespace LLMcomunication
             };
         }
 
-        // Asynchronously processes the user input, streams the assistant response, and returns the complete answer.
+        // GetChatResponseAsync asynchronously processes user input, streams the assistant's response, and returns the complete reply.
         public async Task<string> GetChatResponseAsync(string userInput, Action<string> streamOutput)
         {
             // Add the user's message to the conversation history.
@@ -59,8 +69,10 @@ namespace LLMcomunication
             string completeResponse = string.Empty;
             try
             {
+                // Stream the assistant's response from the chat client.
                 await foreach (StreamingChatCompletionUpdate update in _chatClient.CompleteChatStreamingAsync(Conversation))
                 {
+                    // Process each part of the response and stream it to the client.
                     foreach (ChatMessageContentPart updatePart in update.ContentUpdate)
                     {
                         streamOutput(updatePart.Text);
@@ -70,12 +82,14 @@ namespace LLMcomunication
             }
             catch (Exception ex)
             {
+                // Wrap and rethrow any exception with additional context.
                 throw new Exception("An error occurred while processing the request: " + ex.Message);
             }
 
-            // Add the assistant's reply to the conversation history.
+            // Add the complete assistant response to the conversation history.
             Conversation.Add(new AssistantChatMessage(completeResponse));
             return completeResponse;
         }
     }
+}
 }

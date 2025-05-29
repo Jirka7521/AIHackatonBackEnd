@@ -18,11 +18,12 @@ This backend service allows you to:
 2. Set up your configuration:
    ```bash
    {
-   "AzureOpenAI":
-      {
-         "Endpoint": "https://<your-resource-name>.openai.azure.com/",
-         "ApiKey": "<your-api-key>"
-         "DeploymentName": "<your-deployment-name>"
+      "AzureOpenAI":
+         {
+            "Endpoint": "https://<your-resource-name>.openai.azure.com/",
+            "ApiKey": "<your-api-key>"
+            "DeploymentName": "<your-deployment-name>"
+         }
       }
    }
    ```
@@ -31,6 +32,7 @@ This backend service allows you to:
    ```bash
    dotnet run
    ```
+
 
 4. Start chatting! Type your messages and press Enter. Submit an empty line to exit.
 
@@ -45,6 +47,16 @@ This backend service allows you to:
 - C# / .NET 6.0+
 - Azure.AI.OpenAI SDK
 - Microsoft.Extensions.Configuration
+
+## NuGet Packages
+
+Install the following NuGet packages to ensure proper configuration and Azure OpenAI functionality:
+```bash
+dotnet add package Microsoft.Extensions.Configuration
+dotnet add package Microsoft.Extensions.Configuration.Json
+dotnet add package Azure.AI.OpenAI
+dotnet add package Azure.core
+```
 
 ## Getting Help
 
