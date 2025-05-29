@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLMcomunication\\LLMcomunication.csproj": {}
+    "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\LLM.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLMcomunication\\LLMcomunication.csproj": {
+    "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\LLM.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLMcomunication\\LLMcomunication.csproj",
-        "projectName": "LLMcomunication",
-        "projectPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLMcomunication\\LLMcomunication.csproj",
+        "projectUniqueName": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\LLM.csproj",
+        "projectName": "LLM",
+        "projectPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\LLM.csproj",
         "packagesPath": "C:\\Users\\jirim\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLMcomunication\\obj\\",
+        "outputPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,24 +50,6 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "dependencies": {
-            "Azure.AI.OpenAI": {
-              "target": "Package",
-              "version": "[2.1.0, )"
-            },
-            "Azure.Core": {
-              "target": "Package",
-              "version": "[1.46.1, )"
-            },
-            "Microsoft.Extensions.Configuration.FileExtensions": {
-              "target": "Package",
-              "version": "[9.0.5, )"
-            },
-            "Microsoft.Extensions.Configuration.Json": {
-              "target": "Package",
-              "version": "[9.0.5, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",

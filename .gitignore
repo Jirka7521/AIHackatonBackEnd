@@ -3,5 +3,4 @@
 ################################################################################
 
 /.vs
-/LLMcomunication/bin/Debug/net9.0
-/LLMcomunication/appsettings.json
+/LLM/.vs/LLM
