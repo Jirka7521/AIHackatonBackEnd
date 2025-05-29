@@ -92,30 +92,21 @@ internal class Program
             await cloudServicesStore.UpsertAsync(service);
         }
 
-        Console.WriteLine("Press any key to continue or 'q' to quit...");
-        while (true)
+        // Convert a search query to a vector and search the vector store.
+        string query = "Can you recomend me Azure service to store large documets.";
+        ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
+
+        var results = new List<VectorSearchResult<CloudService>>();
+        await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
         {
-            if (Console.ReadKey(true).KeyChar == 'q')
-            {
-                break;
-            }
-            // Convert a search query to a vector and search the vector store.
-            string query = Console.ReadLine() ?? string.Empty;
-            ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
+            results.Add(result);
+        }
 
-            var results = new List<VectorSearchResult<CloudService>>();
-            await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
-            {
-                results.Add(result);
-            }
-
-            foreach (VectorSearchResult<CloudService> result in results)
-            {
-                Console.WriteLine($"Name: {result.Record.Name}");
-                Console.WriteLine($"Description: {result.Record.Description}");
-                Console.WriteLine($"Vector match score: {result.Score}");
-            }
-
+        foreach (VectorSearchResult<CloudService> result in results)
+        {
+            Console.WriteLine($"Name: {result.Record.Name}");
+            Console.WriteLine($"Description: {result.Record.Description}");
+            Console.WriteLine($"Vector match score: {result.Score}");
         }
         
     }
