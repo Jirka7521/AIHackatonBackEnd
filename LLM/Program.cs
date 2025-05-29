@@ -29,6 +29,7 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
+        // Prepare the list of cloud services.
         List<CloudService> cloudServices = new List<CloudService>
         {
             new CloudService {
@@ -63,7 +64,7 @@ internal class Program
             }
         };
 
-        // Load configuration from appsettings.json
+        // Load configuration from appsettings.json.
         IConfiguration configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
@@ -73,13 +74,13 @@ internal class Program
         string model = configuration["AzureOpenAI:Model"];
         string apiKey = configuration["AzureOpenAI:ApiKey"];
 
-        // Create the embedding generator using AzureKeyCredential with the API key from configuration.
+        // Create the embedding generator using AzureKeyCredential.
         IEmbeddingGenerator<string, Embedding<float>> generator =
             new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey))
                 .GetEmbeddingClient(deploymentName: model)
                 .AsIEmbeddingGenerator();
 
-        // Create and populate the vector store.
+        // Create and populate the in-memory vector store.
         var vectorStore = new InMemoryVectorStore();
         VectorStoreCollection<int, CloudService> cloudServicesStore =
             vectorStore.GetCollection<int, CloudService>("cloudServices");
@@ -91,21 +92,31 @@ internal class Program
             await cloudServicesStore.UpsertAsync(service);
         }
 
-        // Convert a search query to a vector and search the vector store.
-        string query = "Which Azure service should I use to store my Word documents?";
-        ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
-
-        var results = new List<VectorSearchResult<CloudService>>();
-        await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
+        Console.WriteLine("Press any key to continue or 'q' to quit...");
+        while (true)
         {
-            results.Add(result);
-        }
+            if (Console.ReadKey(true).KeyChar == 'q')
+            {
+                break;
+            }
+            // Convert a search query to a vector and search the vector store.
+            string query = Console.ReadLine() ?? string.Empty;
+            ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
 
-        foreach (VectorSearchResult<CloudService> result in results)
-        {
-            Console.WriteLine($"Name: {result.Record.Name}");
-            Console.WriteLine($"Description: {result.Record.Description}");
-            Console.WriteLine($"Vector match score: {result.Score}");
+            var results = new List<VectorSearchResult<CloudService>>();
+            await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
+            {
+                results.Add(result);
+            }
+
+            foreach (VectorSearchResult<CloudService> result in results)
+            {
+                Console.WriteLine($"Name: {result.Record.Name}");
+                Console.WriteLine($"Description: {result.Record.Description}");
+                Console.WriteLine($"Vector match score: {result.Score}");
+            }
+
         }
+        
     }
 }
