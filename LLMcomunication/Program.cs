@@ -1,103 +1,141 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
 using Azure;
 using Azure.AI.OpenAI;
 using System.IO;
 
-try
+class LLMService
 {
-    // Build configuration from appsettings.json.
-    IConfiguration config = new ConfigurationBuilder()
-        .SetBasePath(AppContext.BaseDirectory)
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .Build();
+    private readonly ChatClient _chatClient;
+    public List<ChatMessage> Conversation { get; private set; }
 
-    // Retrieve secure settings from configuration.
-    string endpointStr = config["AzureOpenAI:Endpoint"];
-    string apiKey = config["AzureOpenAI:ApiKey"];
-    string deploymentName = config["AzureOpenAI:DeploymentName"];
-
-    // Test/log configuration values (avoid exposing sensitive data in production).
-    Console.WriteLine("Configuration Values:");
-    Console.WriteLine(string.IsNullOrWhiteSpace(endpointStr)
-        ? "AzureOpenAI:Endpoint not set"
-        : $"AzureOpenAI:Endpoint is set to {endpointStr}");
-    Console.WriteLine(string.IsNullOrWhiteSpace(apiKey)
-        ? "AzureOpenAI:ApiKey not set"
-        : $"AzureOpenAI:ApiKey is set ({(apiKey.Length > 4 ? $"{apiKey.Substring(0, 4)}..." : "value present")})");
-    Console.WriteLine(string.IsNullOrWhiteSpace(deploymentName)
-        ? "AzureOpenAI:DeploymentName not set"
-        : $"AzureOpenAI:DeploymentName is set to {deploymentName}");
-
-    if (string.IsNullOrWhiteSpace(endpointStr) ||
-        string.IsNullOrWhiteSpace(apiKey) ||
-        string.IsNullOrWhiteSpace(deploymentName))
+    public LLMService()
     {
-        throw new Exception("Missing configuration values. Please set AzureOpenAI:Endpoint, AzureOpenAI:ApiKey, and AzureOpenAI:DeploymentName in appsettings.json.");
+        // Build configuration from appsettings.json.
+        IConfiguration config = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        // Retrieve secure settings from configuration.
+        string endpointStr = config["AzureOpenAI:Endpoint"];
+        string apiKey = config["AzureOpenAI:ApiKey"];
+        string deploymentName = config["AzureOpenAI:DeploymentName"];
+
+        // Validate configuration values.
+        if (string.IsNullOrWhiteSpace(endpointStr) ||
+            string.IsNullOrWhiteSpace(apiKey) ||
+            string.IsNullOrWhiteSpace(deploymentName))
+        {
+            throw new Exception("Missing configuration values. Please set AzureOpenAI:Endpoint, AzureOpenAI:ApiKey, and AzureOpenAI:DeploymentName in appsettings.json.");
+        }
+
+        if (!Uri.TryCreate(endpointStr, UriKind.Absolute, out var endpoint))
+        {
+            throw new Exception("The provided endpoint is not a valid URI.");
+        }
+
+        // Initialize the Azure OpenAI client.
+        AzureOpenAIClient azureClient = new AzureOpenAIClient(endpoint, new AzureKeyCredential(apiKey));
+        _chatClient = azureClient.GetChatClient(deploymentName);
+
+        // Starting conversation with a system message that sets the context.
+        Conversation = new List<ChatMessage>
+        {
+            new SystemChatMessage("You are a helpful assistant.")
+        };
     }
 
-    if (!Uri.TryCreate(endpointStr, UriKind.Absolute, out var endpoint))
+    // Asynchronously processes the user input, streams the assistant response, and returns the complete answer.
+    public async Task<string> GetChatResponseAsync(string userInput, Action<string> streamOutput)
     {
-        throw new Exception("The provided endpoint is not a valid URI.");
-    }
-
-    // Initialize the Azure OpenAI client.
-    AzureOpenAIClient azureClient = new(
-        endpoint,
-        new AzureKeyCredential(apiKey));
-    ChatClient chatClient = azureClient.GetChatClient(deploymentName);
-
-    // Starting conversation with a system message that sets the context.
-    List<ChatMessage> messages = new List<ChatMessage>
-    {
-        new SystemChatMessage("You are a helpful assistant.")
-    };
-
-    Console.WriteLine("Enter your messages. Submit an empty line to exit.");
-
-    while (true)
-    {
-        Console.Write("User: ");
-        string input = Console.ReadLine();
-
-        // Exit the chat if the user inputs an empty message.
-        if (string.IsNullOrWhiteSpace(input))
-            break;
-
         // Add the user's message to the conversation history.
-        messages.Add(new UserChatMessage(input));
+        Conversation.Add(new UserChatMessage(userInput));
 
-        Console.Write("Assistant: ");
+        string completeResponse = string.Empty;
         try
         {
-            var response = chatClient.CompleteChatStreaming(messages);
-
-            // Buffer to capture the complete assistant's answer.
-            string completeResponse = string.Empty;
-
-            foreach (StreamingChatCompletionUpdate update in response)
+            // Assuming a streaming asynchronous variant is available.
+            await foreach (StreamingChatCompletionUpdate update in _chatClient.CompleteChatStreamingAsync(Conversation))
             {
                 foreach (ChatMessageContentPart updatePart in update.ContentUpdate)
                 {
-                    Console.Write(updatePart.Text);
+                    streamOutput(updatePart.Text);
                     completeResponse += updatePart.Text;
                 }
             }
-            Console.WriteLine();
-
-            // Add the assistant's reply to the conversation history.
-            messages.Add(new AssistantChatMessage(completeResponse));
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while processing the request: {ex.Message}");
+            throw new Exception("An error occurred while processing the request: " + ex.Message);
         }
+
+        // Add the assistant's reply to the conversation history.
+        Conversation.Add(new AssistantChatMessage(completeResponse));
+        return completeResponse;
     }
 }
-catch (Exception ex)
+
+class ConsolePrinter
 {
-    Console.Error.WriteLine($"Critical error: {ex.Message}");
-    Environment.Exit(1);
+    public void PrintLine(string message = "")
+    {
+        Console.WriteLine(message);
+    }
+
+    public void Print(string message)
+    {
+        Console.Write(message);
+    }
+
+    public string ReadLine()
+    {
+        return Console.ReadLine();
+    }
+}
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var printer = new ConsolePrinter();
+        LLMService llmService;
+
+        try
+        {
+            llmService = new LLMService();
+            printer.PrintLine("LLM Service initialized successfully with provided configuration.");
+        }
+        catch (Exception ex)
+        {
+            printer.PrintLine($"Critical error: {ex.Message}");
+            Environment.Exit(1);
+            return;
+        }
+
+        printer.PrintLine("Enter your messages. Submit an empty line to exit.");
+
+        while (true)
+        {
+            printer.Print("User: ");
+            string input = printer.ReadLine();
+            if (string.IsNullOrWhiteSpace(input))
+                break;
+
+            printer.Print("Assistant: ");
+            try
+            {
+                // Get the chat response while streaming output through the printer.
+                await llmService.GetChatResponseAsync(input, text => printer.Print(text));
+                printer.PrintLine();
+            }
+            catch (Exception ex)
+            {
+                printer.PrintLine(ex.Message);
+            }
+        }
+    }
 }
