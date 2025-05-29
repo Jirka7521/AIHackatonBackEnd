@@ -52,10 +52,12 @@ This backend service allows you to:
 
 Install the following NuGet packages to ensure proper configuration and Azure OpenAI functionality:
 ```bash
-dotnet add package Microsoft.Extensions.Configuration
-dotnet add package Microsoft.Extensions.Configuration.Json
 dotnet add package Azure.AI.OpenAI
-dotnet add package Azure.core
+dotnet add package Azure.Identity
+dotnet add package Microsoft.Extensions.AI
+dotnet add package Microsoft.Extensions.AI.OpenAI --prerelease
+dotnet add package Microsoft.Extensions.Configuration
+dotnet add package Microsoft.Extensions.Configuration.UserSecrets
 ```
 
 ## Getting Help
