@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LLM")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1dc9e3e6101ba9c8950ea1137574597a0856d83f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b4db438a76ecb26571c35f8e9c00d2322297fca")]
 [assembly: System.Reflection.AssemblyProductAttribute("LLM")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LLM")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
