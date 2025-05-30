@@ -44,3 +44,10 @@ C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\obj\Debug\net9.0\LLM
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\obj\Debug\net9.0\LLM.genruntimeconfig.cache
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\obj\Debug\net9.0\ref\LLM.dll
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\appsettings.json
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Core.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.DocumentLayoutAnalysis.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Fonts.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Package.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Tokenization.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Tokens.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.dll

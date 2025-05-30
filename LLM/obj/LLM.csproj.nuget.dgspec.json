@@ -82,6 +82,10 @@
             "Microsoft.SemanticKernel.Connectors.InMemory": {
               "target": "Package",
               "version": "[1.54.0-preview, )"
+            },
+            "PdfPig": {
+              "target": "Package",
+              "version": "[0.1.10, )"
             }
           },
           "imports": [
