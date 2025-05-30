@@ -18,12 +18,19 @@ internal class Program
         {
             try
             {
-                string uploadMessage = await endpoints.UploadPdfAsync(filePath);
-                Console.WriteLine(uploadMessage);
+                var uploadResult = await endpoints.UploadPdfAsync(filePath);
+                if (uploadResult.Status == OperationStatus.Success)
+                {
+                    Console.WriteLine(uploadResult.Message);
+                }
+                else
+                {
+                    Console.WriteLine($"Error during file upload: {uploadResult.Message}");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during file upload: {ex.Message}");
+                Console.WriteLine($"Exception during file upload: {ex.Message}");
             }
         }
         else

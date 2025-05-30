@@ -8,7 +8,6 @@ using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.InMemory;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -71,22 +70,15 @@ public class VectorEndpoints
     private int _nextId;
 
     /// <summary>
-    /// Minimum similarity threshold for filtering vector search results.
-    /// </summary>
-    private readonly float _minSimilarityThreshold;
-
-    /// <summary>
     /// Private constructor to enforce asynchronous initialization via <see cref="CreateAsync"/>.
     /// </summary>
     /// <param name="generator">The embedding generator for converting text into vectors.</param>
     /// <param name="pdfStore">The vector store collection containing PDF records.</param>
-    /// <param name="minSimilarityThreshold">The minimum similarity threshold for vector search results.</param>
-    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, VectorStoreCollection<int, PdfRecord> pdfStore, float minSimilarityThreshold)
+    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, VectorStoreCollection<int, PdfRecord> pdfStore)
     {
         _generator = generator;
         _pdfStore = pdfStore;
         _nextId = 0;
-        _minSimilarityThreshold = minSimilarityThreshold;
     }
 
     /// <summary>
@@ -119,17 +111,8 @@ public class VectorEndpoints
             vectorStore.GetCollection<int, PdfRecord>("pdfRecords");
         await pdfStore.EnsureCollectionExistsAsync();
 
-        // Read and parse the minimum similarity threshold from configuration.
-        float minThreshold = 0.7f;
-        string thresholdSetting = configuration["MinSimilarityThreshold"];
-        if (!string.IsNullOrEmpty(thresholdSetting) &&
-            float.TryParse(thresholdSetting, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedThreshold))
-        {
-            minThreshold = parsedThreshold;
-        }
-
         // Return the initialized instance.
-        return new VectorEndpoints(generator, pdfStore, minThreshold);
+        return new VectorEndpoints(generator, pdfStore);
     }
 
     /// <summary>
@@ -162,9 +145,8 @@ public class VectorEndpoints
         // Normalize the extracted content to ensure proper Unicode (e.g., Czech letters) is preserved.
         string pdfContent = contentBuilder.ToString().Normalize(NormalizationForm.FormC);
 
-        // Splitting the PDF content into smaller chunks (optimal size ~3000 characters optimizes local context capture)
-        // Generating separate vectors for each chunk allows retrieval of more precise segments compared to aggregating the full text.
-        const int chunkSize = 2000;
+        // Split the PDF content into chunks (using a chunk size of 8000 characters).
+        const int chunkSize = 8000;
         List<string> chunks = new List<string>();
         for (int i = 0; i < pdfContent.Length; i += chunkSize)
         {
@@ -258,10 +240,6 @@ public class VectorEndpoints
         {
             results.Add(result);
         }
-
-        // Filter results based on the minimum similarity threshold.
-        results = results.Where(r => r.Score >= _minSimilarityThreshold).ToList();
-
         return results;
     }
 }

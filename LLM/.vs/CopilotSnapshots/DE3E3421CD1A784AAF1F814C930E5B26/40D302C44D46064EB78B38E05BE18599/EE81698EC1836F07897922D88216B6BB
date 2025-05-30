@@ -162,9 +162,8 @@ public class VectorEndpoints
         // Normalize the extracted content to ensure proper Unicode (e.g., Czech letters) is preserved.
         string pdfContent = contentBuilder.ToString().Normalize(NormalizationForm.FormC);
 
-        // Splitting the PDF content into smaller chunks (optimal size ~3000 characters optimizes local context capture)
-        // Generating separate vectors for each chunk allows retrieval of more precise segments compared to aggregating the full text.
-        const int chunkSize = 2000;
+        // Split the PDF content into chunks (using a chunk size of 8000 characters).
+        const int chunkSize = 8000;
         List<string> chunks = new List<string>();
         for (int i = 0; i < pdfContent.Length; i += chunkSize)
         {
