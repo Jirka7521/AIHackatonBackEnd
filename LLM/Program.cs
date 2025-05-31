@@ -33,34 +33,43 @@ internal class Program
         // Create an instance of VectorEndpoints with full initialization.
         VectorEndpoints endpoints = await VectorEndpoints.CreateAsync();
 
-        // Endpoint to upload a PDF file and vectorize its content.
-        Console.WriteLine("Enter the full file path of the PDF to upload:");
-        string? filePath = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(filePath))
+        // Ask user whether to upload a PDF file.
+        Console.WriteLine("Do you want to upload a PDF file? (y/n):");
+        string? uploadChoice = Console.ReadLine();
+        if (uploadChoice?.ToLower() == "y")
         {
-            try
+            Console.WriteLine("Enter the full file path of the PDF to upload:");
+            string? filePath = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(filePath))
             {
-                var uploadResult = await endpoints.UploadPdfAsync(filePath);
-                if (uploadResult.Status == OperationStatus.Success)
+                try
                 {
-                    Console.WriteLine(uploadResult.Message);
+                    var uploadResult = await endpoints.UploadPdfAsync(filePath);
+                    if (uploadResult.Status == OperationStatus.Success)
+                    {
+                        Console.WriteLine(uploadResult.Message);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error during file upload: {uploadResult.Message}");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error during file upload: {uploadResult.Message}");
+                    Console.WriteLine($"Exception during file upload: {ex.Message}");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Exception during file upload: {ex.Message}");
+                Console.WriteLine("Invalid file path.");
             }
         }
         else
         {
-            Console.WriteLine("Invalid file path.");
+            Console.WriteLine("Skipping file upload.");
         }
 
-        // Query the vector store for relevant PDF vectors.
+        // Ask user for search query.
         Console.WriteLine("Enter a topic to search for relevant content:");
         string? topic = Console.ReadLine();
         Console.WriteLine("Enter the number of relevant vectors to return:");
@@ -69,14 +78,16 @@ internal class Program
         if (int.TryParse(countStr, out int count) && !string.IsNullOrWhiteSpace(topic))
         {
             var results = await endpoints.GetRelevantVectorsAsync(topic, count);
-            Console.WriteLine($"\nTop {count} matching vectors for the topic: {topic}");
+            Console.WriteLine($"\nTop {count} matching vectors for the topic: {topic} (Database search)");
             foreach (var result in results)
             {
-                Console.WriteLine($"ID: {result.Record.Id}, Score: {result.Score:F3}");
-                string snippet = result.Record.Content.Length > 100 
-                    ? result.Record.Content.Substring(0, 100) + "..." 
-                    : result.Record.Content;
-                Console.WriteLine($"Snippet: {snippet}");
+                // Retrieve text for each vector record.
+                string text = await endpoints.GetVectorTextAsync(result.Id);
+
+                Console.WriteLine($"ID: {result.Id}");
+                Console.WriteLine($"Distance: {result.Distance:F3}");
+                Console.WriteLine($"Path: {result.FileName}");
+                Console.WriteLine($"Text: {text}");
                 Console.WriteLine("---");
             }
         }
@@ -85,7 +96,7 @@ internal class Program
             Console.WriteLine("Invalid input for topic or count.");
         }
 
-        // Continue with the rest of your application or exit.
+        // Continue or exit.
         Console.WriteLine("\nPress any key to exit...");
         Console.ReadKey();
     }

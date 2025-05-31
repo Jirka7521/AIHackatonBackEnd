@@ -4,8 +4,6 @@ using Azure.Core;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
-using Microsoft.Extensions.VectorData;
-using Microsoft.SemanticKernel.Connectors.InMemory;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,16 +16,9 @@ using UglyToad.PdfPig.Content;
 
 public class PdfRecord
 {
-    [VectorStoreKey]
     public int Id { get; set; }
-
-    [VectorStoreData]
     public string FileName { get; set; }
-
-    [VectorStoreData]
     public string Content { get; set; }
-
-    [VectorStoreVector(Dimensions: 384, DistanceFunction = DistanceFunction.CosineSimilarity)]
     public ReadOnlyMemory<float> Vector { get; set; }
 }
 
@@ -50,23 +41,29 @@ public class OperationResult
 }
 
 /// <summary>
+/// Represents a search result from the database vector search.
+/// </summary>
+public class DatabaseVectorSearchResult
+{
+    public int Id { get; set; }
+    public string FileName { get; set; }
+    public double Distance { get; set; }
+}
+
+/// <summary>
 /// Provides public endpoints to interact with the vector store for PDF records, including initialization, 
-/// vectorization of uploaded PDF files, and querying for relevant vectors. It now also persists data to a PostgreSQL database.
+/// vectorization of uploaded PDF files, and querying for relevant vectors using PostgreSQL database.
 /// </summary>
 public class VectorEndpoints
 {
     private readonly IEmbeddingGenerator<string, Embedding<float>> _generator;
-    private readonly VectorStoreCollection<int, PdfRecord> _pdfStore;
     private readonly PostgresDatabase _database;
     private int _nextId;
-    private readonly float _minSimilarityThreshold;
 
-    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, VectorStoreCollection<int, PdfRecord> pdfStore, float minSimilarityThreshold, PostgresDatabase database)
+    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, PostgresDatabase database)
     {
         _generator = generator;
-        _pdfStore = pdfStore;
         _nextId = 0;
-        _minSimilarityThreshold = minSimilarityThreshold;
         _database = database;
     }
 
@@ -85,24 +82,11 @@ public class VectorEndpoints
                 .GetEmbeddingClient(deploymentName: vectorModel)
                 .AsIEmbeddingGenerator();
 
-        InMemoryVectorStore vectorStore = new InMemoryVectorStore();
-        VectorStoreCollection<int, PdfRecord> pdfStore =
-            vectorStore.GetCollection<int, PdfRecord>("pdfRecords");
-        await pdfStore.EnsureCollectionExistsAsync();
-
-        float minThreshold = 0.7f;
-        string thresholdSetting = configuration["MinSimilarityThreshold"];
-        if (!string.IsNullOrEmpty(thresholdSetting) &&
-            float.TryParse(thresholdSetting, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedThreshold))
-        {
-            minThreshold = parsedThreshold;
-        }
-
         string postgresConnectionString = configuration["Postgres:ConnectionString"];
         var database = new PostgresDatabase(postgresConnectionString);
         await database.EnsureTableExistsAsync();
 
-        return new VectorEndpoints(generator, pdfStore, minThreshold, database);
+        return new VectorEndpoints(generator, database);
     }
 
     public async Task<OperationResult> UploadPdfAsync(string filePath)
@@ -142,7 +126,6 @@ public class VectorEndpoints
                 Vector = vector
             };
 
-            await _pdfStore.UpsertAsync(pdfRecord);
             await _database.InsertPdfRecordAsync(pdfRecord);
             chunkId++;
         }
@@ -151,7 +134,7 @@ public class VectorEndpoints
         return new OperationResult
         {
             Status = OperationStatus.Success,
-            Message = "File uploaded, vectorized, and persisted successfully."
+            Message = "File uploaded, vectorized, and persisted to database successfully."
         };
     }
 
@@ -159,11 +142,12 @@ public class VectorEndpoints
     {
         try
         {
-            await _pdfStore.EnsureCollectionExistsAsync();
+            // Check database connection by attempting a simple operation
+            await _database.EnsureTableExistsAsync();
             return new OperationResult
             {
                 Status = OperationStatus.Success,
-                Message = "The vector store is accessible."
+                Message = "The database is accessible."
             };
         }
         catch (Exception ex)
@@ -171,12 +155,18 @@ public class VectorEndpoints
             return new OperationResult
             {
                 Status = OperationStatus.Error,
-                Message = $"Error: {ex.Message}"
+                Message = $"Database error: {ex.Message}"
             };
         }
     }
 
-    public async Task<List<VectorSearchResult<PdfRecord>>> GetRelevantVectorsAsync(string prompt, int count)
+    /// <summary>
+    /// Searches for the most similar vectors stored in the PostgreSQL database using the pgvector extension.
+    /// </summary>
+    /// <param name="prompt">The prompt to generate the query vector from.</param>
+    /// <param name="count">The number of matching records to request.</param>
+    /// <returns>A list of database search results including record Id, FileName, and computed distance.</returns>
+    public async Task<List<DatabaseVectorSearchResult>> GetRelevantVectorsAsync(string prompt, int count)
     {
         if (string.IsNullOrWhiteSpace(prompt))
         {
@@ -188,12 +178,22 @@ public class VectorEndpoints
         }
 
         ReadOnlyMemory<float> promptVector = await _generator.GenerateVectorAsync(prompt);
-        List<VectorSearchResult<PdfRecord>> results = new List<VectorSearchResult<PdfRecord>>();
-        await foreach (var result in _pdfStore.SearchAsync(promptVector, top: count))
+        var dbResults = await _database.SearchSimilarVectorsAsync(promptVector, count);
+        return dbResults.Select(r => new DatabaseVectorSearchResult
         {
-            results.Add(result);
+            Id = r.Id,
+            FileName = r.FilePath,
+            Distance = 1 - r.Similarity // Converting similarity to distance
+        }).ToList();
+    }
+
+    public async Task<string> GetVectorTextAsync(int id)
+    {
+        var record = await _database.GetPdfRecordByIdAsync(id);
+        if (record is null)
+        {
+            throw new ArgumentException($"No vector found with id {id}", nameof(id));
         }
-        results = results.Where(r => r.Score >= _minSimilarityThreshold).ToList();
-        return results;
+        return record.Content;
     }
 }

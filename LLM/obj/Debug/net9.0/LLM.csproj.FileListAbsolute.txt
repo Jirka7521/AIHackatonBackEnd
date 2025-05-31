@@ -52,3 +52,4 @@ C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\Ugl
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.Tokens.dll
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\UglyToad.PdfPig.dll
 C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\Npgsql.dll
+C:\Users\jirim\source\repos\Jirka7521\AIHackatonBackEnd\LLM\bin\Debug\net9.0\CosineSimilarity.sql
