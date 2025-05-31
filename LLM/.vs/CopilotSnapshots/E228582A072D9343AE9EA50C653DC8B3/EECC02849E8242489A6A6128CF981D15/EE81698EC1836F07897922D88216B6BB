@@ -60,11 +60,7 @@ public class VectorEndpoints
     private readonly PostgresDatabase _database;
     private int _nextId;
 
-    /// <summary>
-    /// Initializes a new instance of the VectorEndpoints class with the specified embedding generator and database.
-    /// </summary>
-    /// <param name="generator">The embedding generator used for vectorizing text.</param>
-    /// <param name="database">The PostgreSQL database for storing PDF records.</param>
+    // Constructor sets up embedding generator and database connection.
     private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, PostgresDatabase database)
     {
         _generator = generator;
@@ -72,10 +68,7 @@ public class VectorEndpoints
         _database = database;
     }
 
-    /// <summary>
-    /// Creates an instance of VectorEndpoints by loading configuration, initializing the embedding generator, and setting up the database.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation, with a VectorEndpoints instance as result.</returns>
+    // Private factory method to encapsulate dependency creation.
     private static async Task<VectorEndpoints> CreateInstanceAsync()
     {
         // Build configuration from JSON file.
@@ -106,8 +99,6 @@ public class VectorEndpoints
     /// <summary>
     /// Uploads a file, vectorizes its contents, and saves all vector chunks to the database.
     /// </summary>
-    /// <param name="filePath">The full path of the PDF file to upload.</param>
-    /// <returns>A task representing the asynchronous operation, with an OperationResult indicating the upload status.</returns>
     public static async Task<OperationResult> UploadFileAsync(string filePath)
     {
         // Validate file path input.
@@ -171,9 +162,6 @@ public class VectorEndpoints
     /// <summary>
     /// Searches for the n closest vectors to the query and returns their id and text.
     /// </summary>
-    /// <param name="query">The text query to vectorize and search for similar vectors.</param>
-    /// <param name="count">The number of closest vectors to return.</param>
-    /// <returns>A task representing the asynchronous operation, with a list of QueryResult containing matching vector information.</returns>
     public static async Task<List<QueryResult>> QueryVectorsAsync(string query, int count)
     {
         // Validate query input.
@@ -210,8 +198,6 @@ public class VectorEndpoints
     /// <summary>
     /// Retrieves the file path associated with the given vector id.
     /// </summary>
-    /// <param name="id">The identifier of the vector record.</param>
-    /// <returns>A task representing the asynchronous operation, with the file path as result.</returns>
     public static async Task<string> GetFilePathAsync(int id)
     {
         VectorEndpoints instance = await CreateInstanceAsync();
