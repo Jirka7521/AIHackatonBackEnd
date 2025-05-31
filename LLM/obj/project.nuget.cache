@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "72wuvSLrqws=",
+  "dgSpecHash": "GdksEPVf7N8=",
   "success": true,
   "projectFilePath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\LLM\\LLM.csproj",
   "expectedPackageFiles": [
@@ -26,6 +26,7 @@
     "C:\\Users\\jirim\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.71.1\\microsoft.identity.client.extensions.msal.4.71.1.nupkg.sha512",
     "C:\\Users\\jirim\\.nuget\\packages\\microsoft.identitymodel.abstractions\\6.35.0\\microsoft.identitymodel.abstractions.6.35.0.nupkg.sha512",
     "C:\\Users\\jirim\\.nuget\\packages\\microsoft.semantickernel.connectors.inmemory\\1.54.0-preview\\microsoft.semantickernel.connectors.inmemory.1.54.0-preview.nupkg.sha512",
+    "C:\\Users\\jirim\\.nuget\\packages\\npgsql\\9.0.3\\npgsql.9.0.3.nupkg.sha512",
     "C:\\Users\\jirim\\.nuget\\packages\\openai\\2.2.0-beta.4\\openai.2.2.0-beta.4.nupkg.sha512",
     "C:\\Users\\jirim\\.nuget\\packages\\pdfpig\\0.1.10\\pdfpig.0.1.10.nupkg.sha512",
     "C:\\Users\\jirim\\.nuget\\packages\\system.clientmodel\\1.4.1\\system.clientmodel.1.4.1.nupkg.sha512",

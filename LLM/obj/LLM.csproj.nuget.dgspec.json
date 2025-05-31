@@ -83,6 +83,10 @@
               "target": "Package",
               "version": "[1.54.0-preview, )"
             },
+            "Npgsql": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
             "PdfPig": {
               "target": "Package",
               "version": "[0.1.10, )"

@@ -1,66 +1,112 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 
 internal class Program
 {
     static async Task Main(string[] args)
     {
-        // Set the console input and output encoding to support Unicode characters (e.g., Czech letters).
+        // Configure console I/O to support Unicode characters (e.g., Czech letters).
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
 
-        // Create an instance of VectorEndpoints with full initialization.
-        VectorEndpoints endpoints = await VectorEndpoints.CreateAsync();
+        // Load application configuration from appsettings.json.
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
 
-        // Endpoint to upload a PDF file and vectorize its content.
-        Console.WriteLine("Enter the full file path of the PDF to upload:");
-        string? filePath = Console.ReadLine();
-        if (!string.IsNullOrWhiteSpace(filePath))
+        // Initialize connection to the PostgreSQL database.
+        string connectionString = configuration["Postgres:ConnectionString"];
+        var database = new PostgresDatabase(connectionString);
+        
+        // Ensure that the required tables exist in the database.
+        await database.EnsureTableExistsAsync();
+
+        // Display the current state of the 'source_files' and 'vectors' tables.
+        Console.WriteLine("Displaying contents of the 'source_files' table:");
+        await database.PrintSourceFilesAsync();
+
+        Console.WriteLine("\nDisplaying contents of the 'vectors' table:");
+        await database.PrintVectorsAsync();
+
+        // Prompt the user to determine if they want to upload a PDF file.
+        Console.WriteLine("\nDo you want to upload a PDF file? (y/n):");
+        string? uploadChoice = Console.ReadLine();
+        if (uploadChoice?.ToLower() == "y")
         {
-            try
+            // Ask for the full file path of the PDF.
+            Console.WriteLine("Enter the full file path of the PDF to upload:");
+            string? filePath = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(filePath))
             {
-                var uploadResult = await endpoints.UploadPdfAsync(filePath);
-                if (uploadResult.Status == OperationStatus.Success)
+                try
                 {
+                    // Upload and vectorize the PDF file.
+                    var uploadResult = await VectorEndpoints.UploadFileAsync(filePath);
                     Console.WriteLine(uploadResult.Message);
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error during file upload: {uploadResult.Message}");
+                    Console.WriteLine($"Exception during file upload: {ex.Message}");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Exception during file upload: {ex.Message}");
+                Console.WriteLine("Invalid file path entered.");
             }
         }
         else
         {
-            Console.WriteLine("Invalid file path.");
+            Console.WriteLine("Skipping PDF file upload.");
         }
 
-        // Query the vector store for relevant PDF vectors.
-        Console.WriteLine("Enter a topic to search for relevant content:");
+        // Prompt the user for a content search query.
+        Console.WriteLine("\nEnter a topic to search for relevant content:");
         string? topic = Console.ReadLine();
         Console.WriteLine("Enter the number of relevant vectors to return:");
         string? countStr = Console.ReadLine();
 
+        // Validate input and perform the search if valid.
         if (int.TryParse(countStr, out int count) && !string.IsNullOrWhiteSpace(topic))
         {
-            var results = await endpoints.GetRelevantVectorsAsync(topic, count);
-            Console.WriteLine($"\nTop {count} matching vectors for the topic: {topic}");
-            foreach (var result in results)
+            try
             {
-                Console.WriteLine($"ID: {result.Record.Id}, Score: {result.Score:F3}");
-                string snippet = result.Record.Content.Length > 100 
-                    ? result.Record.Content.Substring(0, 100) + "..." 
-                    : result.Record.Content;
-                Console.WriteLine($"Snippet: {snippet}");
-                Console.WriteLine("---");
+                // Query the vector store using the provided topic and count.
+                var results = await VectorEndpoints.QueryVectorsAsync(topic, count);
+                Console.WriteLine($"\nTop {count} matching vectors for the topic: {topic}");
+
+                // Iterate through each query result.
+                foreach (var result in results)
+                {
+                    Console.WriteLine($"ID: {result.Id}");
+                    Console.WriteLine($"Text: {result.Text}");
+
+                    // Attempt to retrieve the file path corresponding to the vector id.
+                    try
+                    {
+                        string filePath = await VectorEndpoints.GetFilePathAsync(result.Id);
+                        Console.WriteLine($"File Path: {filePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error retrieving file path: {ex.Message}");
+                    }
+                    Console.WriteLine("---");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during query: {ex.Message}");
             }
         }
         else
         {
-            Console.WriteLine("Invalid input for topic or count.");
+            Console.WriteLine("Invalid input for topic or number of results.");
         }
+
+        // Wait for user input before exiting.
+        Console.WriteLine("\nPress any key to exit...");
+        Console.ReadKey();
     }
 }

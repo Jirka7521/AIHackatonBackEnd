@@ -15,6 +15,9 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="CosineSimilarity.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.5.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.InMemory" Version="1.54.0-preview" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="PdfPig" Version="0.1.10" />
   </ItemGroup>
 
