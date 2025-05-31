@@ -1,112 +1,62 @@
-﻿using System.Text;
+﻿using Azure;
+using Azure.AI.OpenAI;
+using Azure.Core;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
+using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 internal class Program
 {
     static async Task Main(string[] args)
     {
-        // Configure console I/O to support Unicode characters (e.g., Czech letters).
-        Console.InputEncoding = Encoding.UTF8;
-        Console.OutputEncoding = Encoding.UTF8;
-
-        // Load application configuration from appsettings.json.
-        IConfiguration configuration = new ConfigurationBuilder()
+        IConfigurationRoot config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
+        string endpoint = config["AzureOpenAILLM:Endpoint"];
+        string deployment = config["AzureOpenAILLM:Deployment"];
+        string apiKey = config["AzureOpenAILLM:ApiKey"];
 
-        // Initialize connection to the PostgreSQL database.
-        string connectionString = configuration["Postgres:ConnectionString"];
-        var database = new PostgresDatabase(connectionString);
-        
-        // Ensure that the required tables exist in the database.
-        await database.EnsureTableExistsAsync();
+        IChatClient chatClient =
+            new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey))
+            .GetChatClient(deployment)
+            .AsIChatClient();
 
-        // Display the current state of the 'source_files' and 'vectors' tables.
-        Console.WriteLine("Displaying contents of the 'source_files' table:");
-        await database.PrintSourceFilesAsync();
-
-        Console.WriteLine("\nDisplaying contents of the 'vectors' table:");
-        await database.PrintVectorsAsync();
-
-        // Prompt the user to determine if they want to upload a PDF file.
-        Console.WriteLine("\nDo you want to upload a PDF file? (y/n):");
-        string? uploadChoice = Console.ReadLine();
-        if (uploadChoice?.ToLower() == "y")
+        // Start the conversation with context for the AI model including learning context.
+        List<Microsoft.Extensions.AI.ChatMessage> chatHistory = new List<Microsoft.Extensions.AI.ChatMessage>
         {
-            // Ask for the full file path of the PDF.
-            Console.WriteLine("Enter the full file path of the PDF to upload:");
-            string? filePath = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(filePath))
-            {
-                try
-                {
-                    // Upload and vectorize the PDF file.
-                    var uploadResult = await VectorEndpoints.UploadFileAsync(filePath);
-                    Console.WriteLine(uploadResult.Message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Exception during file upload: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Invalid file path entered.");
-            }
-        }
-        else
+            new Microsoft.Extensions.AI.ChatMessage(ChatRole.System, @"
+            You are a friendly learning assistant dedicated to helping users understand complex topics and acquire new skills.
+            When interacting with users, you should:
+            
+            1. Introduce yourself and offer a brief overview of your capabilities.
+            2. Ask clarifying questions to better understand the user's learning goals.
+            3. Provide clear, step-by-step explanations and practical examples.
+            4. Reference additional resources or data (e.g., information from related databases or processing of vector data) when helpful.
+            5. Conclude your responses by asking if there is anything else you can explain or help with.
+            ")
+        };
+
+        // Loop to get user input and stream AI response
+        while (true)
         {
-            Console.WriteLine("Skipping PDF file upload.");
-        }
+            // Get user prompt and add to chat history
+            Console.WriteLine("Your prompt:");
+            string? userPrompt = Console.ReadLine();
+            chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, userPrompt));
 
-        // Prompt the user for a content search query.
-        Console.WriteLine("\nEnter a topic to search for relevant content:");
-        string? topic = Console.ReadLine();
-        Console.WriteLine("Enter the number of relevant vectors to return:");
-        string? countStr = Console.ReadLine();
-
-        // Validate input and perform the search if valid.
-        if (int.TryParse(countStr, out int count) && !string.IsNullOrWhiteSpace(topic))
-        {
-            try
+            // Stream the AI response and add to chat history
+            Console.WriteLine("AI Response:");
+            string response = "";
+            await foreach (ChatResponseUpdate item in chatClient.GetStreamingResponseAsync(chatHistory))
             {
-                // Query the vector store using the provided topic and count.
-                var results = await VectorEndpoints.QueryVectorsAsync(topic, count);
-                Console.WriteLine($"\nTop {count} matching vectors for the topic: {topic}");
-
-                // Iterate through each query result.
-                foreach (var result in results)
-                {
-                    Console.WriteLine($"ID: {result.Id}");
-                    Console.WriteLine($"Text: {result.Text}");
-
-                    // Attempt to retrieve the file path corresponding to the vector id.
-                    try
-                    {
-                        string filePath = await VectorEndpoints.GetFilePathAsync(result.Id);
-                        Console.WriteLine($"File Path: {filePath}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error retrieving file path: {ex.Message}");
-                    }
-                    Console.WriteLine("---");
-                }
+                Console.Write(item.Text);
+                response += item.Text;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception during query: {ex.Message}");
-            }
+            chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.Assistant, response));
+            Console.WriteLine();
         }
-        else
-        {
-            Console.WriteLine("Invalid input for topic or number of results.");
-        }
-
-        // Wait for user input before exiting.
-        Console.WriteLine("\nPress any key to exit...");
-        Console.ReadKey();
     }
 }
