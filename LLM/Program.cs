@@ -39,15 +39,32 @@ internal class Program
             ")
         };
 
-        // Loop to get user input and stream AI response
+        // Loop to get user input and stream AI response.
         while (true)
         {
-            // Get user prompt and add to chat history
+            // Get user prompt.
             Console.WriteLine("Your prompt:");
             string? userPrompt = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(userPrompt))
+            {
+                continue;
+            }
+
+            // Add user prompt to the conversation.
             chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, userPrompt));
 
-            // Stream the AI response and add to chat history
+            // RAG: Query the vector store using VectorEndpoints.
+            List<VectorEndpoints.QueryResult> queryResults = await VectorEndpoints.QueryVectorsAsync(userPrompt, 3);
+            string retrievedInfo = "Additional context retrieved from vector store:\n";
+            foreach (var result in queryResults)
+            {
+                retrievedInfo += $"ID: {result.Id}, Content Snippet: {result.Text}\n";
+            }
+
+            // Append the retrieved info as additional context to the conversation.
+            chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.System, retrievedInfo));
+
+            // Stream the AI response and add it to chat history.
             Console.WriteLine("AI Response:");
             string response = "";
             await foreach (ChatResponseUpdate item in chatClient.GetStreamingResponseAsync(chatHistory))
