@@ -1,4 +1,7 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 
 internal class Program
 {
@@ -7,6 +10,25 @@ internal class Program
         // Set the console input and output encoding to support Unicode characters (e.g., Czech letters).
         Console.InputEncoding = Encoding.UTF8;
         Console.OutputEncoding = Encoding.UTF8;
+
+        // Build configuration from appsettings.json.
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        // Retrieve PostgreSQL connection string.
+        string connectionString = configuration["Postgres:ConnectionString"];
+        var database = new PostgresDatabase(connectionString);
+
+        // Ensure tables exist.
+        await database.EnsureTableExistsAsync();
+
+        // Display contents of both tables at startup.
+        Console.WriteLine("Displaying contents of the 'source_files' table:");
+        await database.PrintSourceFilesAsync();
+
+        Console.WriteLine("\nDisplaying contents of the 'vectors' table:");
+        await database.PrintVectorsAsync();
 
         // Create an instance of VectorEndpoints with full initialization.
         VectorEndpoints endpoints = await VectorEndpoints.CreateAsync();
@@ -62,5 +84,9 @@ internal class Program
         {
             Console.WriteLine("Invalid input for topic or count.");
         }
+
+        // Continue with the rest of your application or exit.
+        Console.WriteLine("\nPress any key to exit...");
+        Console.ReadKey();
     }
 }

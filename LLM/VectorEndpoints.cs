@@ -51,75 +51,45 @@ public class OperationResult
 
 /// <summary>
 /// Provides public endpoints to interact with the vector store for PDF records, including initialization, 
-/// vectorization of uploaded PDF files, and querying for relevant vectors.
+/// vectorization of uploaded PDF files, and querying for relevant vectors. It now also persists data to a PostgreSQL database.
 /// </summary>
 public class VectorEndpoints
 {
-    /// <summary>
-    /// The embedding generator used to convert text prompts into vectors.
-    /// </summary>
     private readonly IEmbeddingGenerator<string, Embedding<float>> _generator;
-
-    /// <summary>
-    /// The in-memory vector store collection that holds PdfRecord entries.
-    /// </summary>
     private readonly VectorStoreCollection<int, PdfRecord> _pdfStore;
-
-    /// <summary>
-    /// Internal counter to generate unique IDs for new PDF records.
-    /// </summary>
+    private readonly PostgresDatabase _database;
     private int _nextId;
-
-    /// <summary>
-    /// Minimum similarity threshold for filtering vector search results.
-    /// </summary>
     private readonly float _minSimilarityThreshold;
 
-    /// <summary>
-    /// Private constructor to enforce asynchronous initialization via <see cref="CreateAsync"/>.
-    /// </summary>
-    /// <param name="generator">The embedding generator for converting text into vectors.</param>
-    /// <param name="pdfStore">The vector store collection containing PDF records.</param>
-    /// <param name="minSimilarityThreshold">The minimum similarity threshold for vector search results.</param>
-    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, VectorStoreCollection<int, PdfRecord> pdfStore, float minSimilarityThreshold)
+    private VectorEndpoints(IEmbeddingGenerator<string, Embedding<float>> generator, VectorStoreCollection<int, PdfRecord> pdfStore, float minSimilarityThreshold, PostgresDatabase database)
     {
         _generator = generator;
         _pdfStore = pdfStore;
         _nextId = 0;
         _minSimilarityThreshold = minSimilarityThreshold;
+        _database = database;
     }
 
-    /// <summary>
-    /// Asynchronously creates an instance of <see cref="VectorEndpoints"/> by loading configuration,
-    /// initializing the connection to the Azure OpenAI service, and creating the vector store.
-    /// PDF ingestion is not performed here.
-    /// </summary>
-    /// <returns>An initialized instance of <see cref="VectorEndpoints"/>.</returns>
     public static async Task<VectorEndpoints> CreateAsync()
     {
-        // Load configuration from appsettings.json.
         IConfiguration configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
-        // Retrieve connection details and API key for vector creation.
         string vectorEndpoint = configuration["AzureOpenAIVector:Endpoint"];
         string vectorModel = configuration["AzureOpenAIVector:Model"];
         string vectorApiKey = configuration["AzureOpenAIVector:ApiKey"];
 
-        // Create the embedding generator using AzureKeyCredential.
         IEmbeddingGenerator<string, Embedding<float>> generator =
             new AzureOpenAIClient(new Uri(vectorEndpoint), new AzureKeyCredential(vectorApiKey))
                 .GetEmbeddingClient(deploymentName: vectorModel)
                 .AsIEmbeddingGenerator();
 
-        // Create the in-memory vector store and get the PDF records collection.
         InMemoryVectorStore vectorStore = new InMemoryVectorStore();
         VectorStoreCollection<int, PdfRecord> pdfStore =
             vectorStore.GetCollection<int, PdfRecord>("pdfRecords");
         await pdfStore.EnsureCollectionExistsAsync();
 
-        // Read and parse the minimum similarity threshold from configuration.
         float minThreshold = 0.7f;
         string thresholdSetting = configuration["MinSimilarityThreshold"];
         if (!string.IsNullOrEmpty(thresholdSetting) &&
@@ -128,20 +98,13 @@ public class VectorEndpoints
             minThreshold = parsedThreshold;
         }
 
-        // Return the initialized instance.
-        return new VectorEndpoints(generator, pdfStore, minThreshold);
+        string postgresConnectionString = configuration["Postgres:ConnectionString"];
+        var database = new PostgresDatabase(postgresConnectionString);
+        await database.EnsureTableExistsAsync();
+
+        return new VectorEndpoints(generator, pdfStore, minThreshold, database);
     }
 
-    /// <summary>
-    /// Uploads a PDF file specified by <paramref name="filePath"/>, vectorizes its content, splits the data into chunks,
-    /// and stores the resulting vectors in the vector store.
-    /// </summary>
-    /// <param name="filePath">The full path of the PDF file to upload and vectorize.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result contains an <see cref="OperationResult"/> indicating
-    /// whether the file was uploaded and vectorized successfully.
-    /// </returns>
-    /// <exception cref="ArgumentException">Thrown when the file path is null, empty, or the file does not exist.</exception>
     public async Task<OperationResult> UploadPdfAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
@@ -150,8 +113,6 @@ public class VectorEndpoints
         }
 
         StringBuilder contentBuilder = new StringBuilder();
-
-        // Use PdfPig to extract text from the PDF.
         using (PdfDocument pdf = PdfDocument.Open(filePath))
         {
             foreach (Page page in pdf.GetPages())
@@ -159,11 +120,8 @@ public class VectorEndpoints
                 contentBuilder.AppendLine(page.Text);
             }
         }
-        // Normalize the extracted content to ensure proper Unicode (e.g., Czech letters) is preserved.
         string pdfContent = contentBuilder.ToString().Normalize(NormalizationForm.FormC);
 
-        // Splitting the PDF content into smaller chunks (optimal size ~3000 characters optimizes local context capture)
-        // Generating separate vectors for each chunk allows retrieval of more precise segments compared to aggregating the full text.
         const int chunkSize = 2000;
         List<string> chunks = new List<string>();
         for (int i = 0; i < pdfContent.Length; i += chunkSize)
@@ -172,7 +130,6 @@ public class VectorEndpoints
             chunks.Add(pdfContent.Substring(i, length));
         }
 
-        // Generate embeddings for each chunk and populate the vector store.
         int chunkId = _nextId;
         foreach (string chunk in chunks)
         {
@@ -186,6 +143,7 @@ public class VectorEndpoints
             };
 
             await _pdfStore.UpsertAsync(pdfRecord);
+            await _database.InsertPdfRecordAsync(pdfRecord);
             chunkId++;
         }
 
@@ -193,22 +151,14 @@ public class VectorEndpoints
         return new OperationResult
         {
             Status = OperationStatus.Success,
-            Message = "File uploaded and vectorized successfully."
+            Message = "File uploaded, vectorized, and persisted successfully."
         };
     }
 
-    /// <summary>
-    /// Checks the health of the vector store by ensuring the PDF records collection exists.
-    /// </summary>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result contains an <see cref="OperationResult"/> indicating
-    /// whether the vector store is accessible.
-    /// </returns>
     public async Task<OperationResult> GetHealthAsync()
     {
         try
         {
-            // Ensure the PDF records collection exists in the vector store.
             await _pdfStore.EnsureCollectionExistsAsync();
             return new OperationResult
             {
@@ -226,20 +176,8 @@ public class VectorEndpoints
         }
     }
 
-    /// <summary>
-    /// Retrieves the top relevant PDF record vectors based on the specified prompt.
-    /// </summary>
-    /// <param name="prompt">The text prompt or topic used to generate a search vector.</param>
-    /// <param name="count">The number of relevant vectors to retrieve.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The task result contains a list of vector search results that include PDF records.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the prompt is null or whitespace, or when count is less than or equal to zero.
-    /// </exception>
     public async Task<List<VectorSearchResult<PdfRecord>>> GetRelevantVectorsAsync(string prompt, int count)
     {
-        // Validate input parameters.
         if (string.IsNullOrWhiteSpace(prompt))
         {
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
@@ -249,19 +187,13 @@ public class VectorEndpoints
             throw new ArgumentException("Count must be greater than zero.", nameof(count));
         }
 
-        // Generate a vector representation for the provided prompt.
         ReadOnlyMemory<float> promptVector = await _generator.GenerateVectorAsync(prompt);
-
-        // Retrieve and collect the top 'count' vector search results matching the generated prompt vector.
         List<VectorSearchResult<PdfRecord>> results = new List<VectorSearchResult<PdfRecord>>();
         await foreach (var result in _pdfStore.SearchAsync(promptVector, top: count))
         {
             results.Add(result);
         }
-
-        // Filter results based on the minimum similarity threshold.
         results = results.Where(r => r.Score >= _minSimilarityThreshold).ToList();
-
         return results;
     }
 }
