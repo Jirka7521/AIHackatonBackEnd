@@ -9,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure;
+using Azure.AI.OpenAI.Chat;
+using OpenAI.Chat;
+using ChatMessage = OpenAI.Chat.ChatMessage;
 
 internal class CloudService
 {
@@ -73,10 +76,14 @@ internal class Program
         string endpoint = configuration["AzureOpenAI:Endpoint"];
         string model = configuration["AzureOpenAI:Model"];
         string apiKey = configuration["AzureOpenAI:ApiKey"];
+        
+        
+        // Create openAi client
+        var azureOpenAiClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
         // Create the embedding generator using AzureKeyCredential.
         IEmbeddingGenerator<string, Embedding<float>> generator =
-            new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey))
+            azureOpenAiClient
                 .GetEmbeddingClient(deploymentName: model)
                 .AsIEmbeddingGenerator();
 
@@ -97,11 +104,50 @@ internal class Program
         ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
 
         var results = new List<VectorSearchResult<CloudService>>();
+        //TODO Adjust the top parameter
         await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
         {
             results.Add(result);
         }
+        
+        //Maybe consider later
+        //TODO: Use metadata in embedded vectors (if possible) to limit potentially useless results (e.g. Cloud services, programming languages etc.) for vector search
+        //TODO: Think about semantically dividing the desired pdf files. For example chunking by fixed size can cut sentences in half ... 
+        
+        
+        
+        //TODO: Main QUEST - Augment the LLM query with the vector search results
+        
+        //Create LLM client to send an Augmented query
+        //Move the declarations to the top later
+        //TODO: Specify the model name
+        var chatClient = azureOpenAiClient.GetChatClient("model-name-ChangeMe");
+        var chatOptions = new ChatCompletionOptions
+        {
+            //TODO: Customize accordingly
+            //Temperature how much randomness to allow in the response 
+            Temperature = 0.5f,
+            //Range of tokens considered by the LLM model based on their cumulative propability
+            TopP = 0.95f
+        };
+        
+        
+        //TODO: Get the desired information for LLM model from results object which contains the VectorSearchResults
+        //TODO: Replace the User chat message with actual user query
+        ChatMessage[] chatMessages =
+        {
+            //System message like "You are helpful assistant, respond to user based on following context" etc. ....
+            ChatMessage.CreateSystemMessage("System chat message ... "),
+            //User query
+            ChatMessage.CreateUserMessage("User chat message ... "),
+        };
 
+        //Send request to the LLM model based on chat messages and options
+        var chatResult = await chatClient.CompleteChatAsync(chatMessages, chatOptions);
+        //Hopefully works 
+        //TODO: Make it work if doesn't
+        string chatResponse = chatResult.Value.Content[0].Text;
+        
         foreach (VectorSearchResult<CloudService> result in results)
         {
             Console.WriteLine($"Name: {result.Record.Name}");
