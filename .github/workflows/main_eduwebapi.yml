@@ -24,45 +24,26 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        # Change directory to the solution or main project folder
+        run: |
+          cd Api/Api.AppHost
+          dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/Api"
+        # Change directory to the solution or main project folder before publishing
+        run: |
+          cd Api/Api.AppHost
+          dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/Api" # The output path remains the same relative to the original root
+          # Note: The output directory "${{env.DOTNET_ROOT}}/Api" will be C:\Users\runneradmin\AppData\Local\Microsoft\dotnet\sdk\Api
+          # Make sure this output path makes sense for your artifact. If you want the published output
+          # to be relative to your repository root, you might consider an absolute path like 'C:\a\your-repo\published_app'
+          # or a relative path from the current directory, but ensure 'upload-artifact' picks it up correctly.
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
+          # The path here should point to where dotnet publish placed the files.
+          # If dotnet publish -o "${{env.DOTNET_ROOT}}/Api" was run from Api/Api.AppHost,
+          # then the published output is at C:\Users\runneradmin\AppData\Local\Microsoft\dotnet\sdk\Api.
           path: ${{env.DOTNET_ROOT}}/Api
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: .net-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_63B83F5BBD8E4D10A73727428920FCCE }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CA6F527E00144FE1B6FC8C69C1D08E65 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9DDA18C02FA64E3ABEDF5967FCD762DB }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'EDUWebAPI'
-          slot-name: 'Production'
-          package: .
-          
