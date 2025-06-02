@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using LLM.Models;
 
 namespace LLM.Data
 {
@@ -12,6 +13,8 @@ namespace LLM.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Attachment> Attachments { get; set; }
+        public DbSet<SourceFile> SourceFiles { get; set; }
+        public DbSet<VectorRecord> VectorRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,6 +75,28 @@ namespace LLM.Data
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasIndex(e => new { e.WorkspaceId, e.Name }).IsUnique();
+            });
+
+            // SourceFile configuration
+            modelBuilder.Entity<SourceFile>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FilePath).IsRequired();
+                entity.ToTable("source_files");
+            });
+
+            // VectorRecord configuration
+            modelBuilder.Entity<VectorRecord>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.VectorData).IsRequired().HasColumnType("vector(1536)");
+                entity.Property(e => e.Snippet).IsRequired();
+                entity.ToTable("vectors");
+                
+                entity.HasOne(e => e.SourceFile)
+                    .WithMany(e => e.Vectors)
+                    .HasForeignKey(e => e.SourceFileId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
 
