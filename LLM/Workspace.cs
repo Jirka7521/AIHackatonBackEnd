@@ -1,4 +1,4 @@
-namespace LLM // nebo namespace podle projektu
+namespace LLM
 {
     public class Workspace
     {
