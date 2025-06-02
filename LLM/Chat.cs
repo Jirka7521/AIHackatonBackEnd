@@ -10,12 +10,12 @@ namespace LLM
 
     public class CreateChatPayload
     {
-        public string Name { get; set; } = default!;
+        public string Name { get; set; };
     }
 
     public class ChatNameAlreadyExistsError
     {
-        public string Name { get; set; } = default!;
+        public string Name { get; set; };
         public string Message => $"Chat '{Name}' already exists";
     }
 
