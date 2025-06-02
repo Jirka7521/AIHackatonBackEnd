@@ -2,15 +2,15 @@
   "version": 3,
   "targets": {
     "net9.0": {
-      "Aspire.Dashboard.Sdk.win-x64/9.0.0": {
+      "Aspire.Dashboard.Sdk.win-arm64/9.0.0": {
         "type": "package",
         "build": {
-          "buildTransitive/Aspire.Dashboard.Sdk.win-x64.props": {},
-          "buildTransitive/Aspire.Dashboard.Sdk.win-x64.targets": {}
+          "buildTransitive/Aspire.Dashboard.Sdk.win-arm64.props": {},
+          "buildTransitive/Aspire.Dashboard.Sdk.win-arm64.targets": {}
         },
         "buildMultiTargeting": {
-          "buildMultiTargeting/Aspire.Dashboard.Sdk.win-x64.props": {},
-          "buildMultiTargeting/Aspire.Dashboard.Sdk.win-x64.targets": {}
+          "buildMultiTargeting/Aspire.Dashboard.Sdk.win-arm64.props": {},
+          "buildMultiTargeting/Aspire.Dashboard.Sdk.win-arm64.targets": {}
         }
       },
       "Aspire.Hosting/9.0.0": {
@@ -131,13 +131,13 @@
           "buildMultiTargeting/Aspire.Hosting.AppHost.targets": {}
         }
       },
-      "Aspire.Hosting.Orchestration.win-x64/9.0.0": {
+      "Aspire.Hosting.Orchestration.win-arm64/9.0.0": {
         "type": "package",
         "build": {
-          "buildTransitive/Aspire.Hosting.Orchestration.win-x64.targets": {}
+          "buildTransitive/Aspire.Hosting.Orchestration.win-arm64.targets": {}
         },
         "buildMultiTargeting": {
-          "buildMultiTargeting/Aspire.Hosting.Orchestration.win-x64.targets": {}
+          "buildMultiTargeting/Aspire.Hosting.Orchestration.win-arm64.targets": {}
         }
       },
       "AspNetCore.HealthChecks.Uris/8.0.1": {
@@ -1178,24 +1178,24 @@
     }
   },
   "libraries": {
-    "Aspire.Dashboard.Sdk.win-x64/9.0.0": {
-      "sha512": "ulspusO89H3sVbJHRK3V6JzB0H8hBcXmVVVDYxUWcEiAIxzOaJgneJDx3oJdQ3mhAfeap/K9s1p4ZH6GCIm+Ow==",
+    "Aspire.Dashboard.Sdk.win-arm64/9.0.0": {
+      "sha512": "Q8hDjR6hm8YDdKRTV7C18Kjnkv8eY+nCFWfvibX78pnWBeHa5nwX9tmCjqXcpXUJx5nFx3ZZYHAn3Qj1nQOQdQ==",
       "type": "package",
-      "path": "aspire.dashboard.sdk.win-x64/9.0.0",
+      "path": "aspire.dashboard.sdk.win-arm64/9.0.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "THIRD-PARTY-NOTICES.TXT",
-        "aspire.dashboard.sdk.win-x64.9.0.0.nupkg.sha512",
-        "aspire.dashboard.sdk.win-x64.nuspec",
-        "build/Aspire.Dashboard.Sdk.win-x64.props",
-        "build/Aspire.Dashboard.Sdk.win-x64.targets",
-        "buildMultiTargeting/Aspire.Dashboard.Sdk.win-x64.props",
-        "buildMultiTargeting/Aspire.Dashboard.Sdk.win-x64.targets",
-        "buildTransitive/Aspire.Dashboard.Sdk.win-x64.props",
-        "buildTransitive/Aspire.Dashboard.Sdk.win-x64.targets",
+        "aspire.dashboard.sdk.win-arm64.9.0.0.nupkg.sha512",
+        "aspire.dashboard.sdk.win-arm64.nuspec",
+        "build/Aspire.Dashboard.Sdk.win-arm64.props",
+        "build/Aspire.Dashboard.Sdk.win-arm64.targets",
+        "buildMultiTargeting/Aspire.Dashboard.Sdk.win-arm64.props",
+        "buildMultiTargeting/Aspire.Dashboard.Sdk.win-arm64.targets",
+        "buildTransitive/Aspire.Dashboard.Sdk.win-arm64.props",
+        "buildTransitive/Aspire.Dashboard.Sdk.win-arm64.targets",
         "tools/Aspire.Dashboard.deps.json",
         "tools/Aspire.Dashboard.dll",
         "tools/Aspire.Dashboard.exe",
@@ -1357,21 +1357,21 @@
         "lib/net9.0/Aspire.Hosting.AppHost.xml"
       ]
     },
-    "Aspire.Hosting.Orchestration.win-x64/9.0.0": {
-      "sha512": "EffdkYWjOdd9IRlNujCXVkHdPJVAJgsb0SWo5kbshNGaHaiKXX6B7Y23VoATlYgG4iv7xeOgVdjcF7kf5lZy9Q==",
+    "Aspire.Hosting.Orchestration.win-arm64/9.0.0": {
+      "sha512": "H4LeVislzVuWe9odyGZ6lvKdHt8PseEifxPrMFZ9+tEjQtwztMZpO+wfdOfReCqAayDVwUg1IhzcteFqQpeaqg==",
       "type": "package",
-      "path": "aspire.hosting.orchestration.win-x64/9.0.0",
+      "path": "aspire.hosting.orchestration.win-arm64/9.0.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "THIRD-PARTY-NOTICES.TXT",
-        "aspire.hosting.orchestration.win-x64.9.0.0.nupkg.sha512",
-        "aspire.hosting.orchestration.win-x64.nuspec",
-        "build/Aspire.Hosting.Orchestration.win-x64.targets",
-        "buildMultiTargeting/Aspire.Hosting.Orchestration.win-x64.targets",
-        "buildTransitive/Aspire.Hosting.Orchestration.win-x64.targets",
+        "aspire.hosting.orchestration.win-arm64.9.0.0.nupkg.sha512",
+        "aspire.hosting.orchestration.win-arm64.nuspec",
+        "build/Aspire.Hosting.Orchestration.win-arm64.targets",
+        "buildMultiTargeting/Aspire.Hosting.Orchestration.win-arm64.targets",
+        "buildTransitive/Aspire.Hosting.Orchestration.win-arm64.targets",
         "tools/EULA.rtf",
         "tools/NOTICE",
         "tools/dcp.exe",
@@ -2895,29 +2895,29 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "Aspire.Dashboard.Sdk.win-x64 >= 9.0.0",
+      "Aspire.Dashboard.Sdk.win-arm64 >= 9.0.0",
       "Aspire.Hosting.AppHost >= 9.0.0",
-      "Aspire.Hosting.Orchestration.win-x64 >= 9.0.0"
+      "Aspire.Hosting.Orchestration.win-arm64 >= 9.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\42079\\.nuget\\packages\\": {},
+    "C:\\Users\\jirim\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\42079\\Source\\Repos\\AIHackatonBackEnd\\Api\\Api.AppHost\\Api.AppHost.csproj",
+      "projectUniqueName": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\Api\\Api.AppHost\\Api.AppHost.csproj",
       "projectName": "Api.AppHost",
-      "projectPath": "C:\\Users\\42079\\Source\\Repos\\AIHackatonBackEnd\\Api\\Api.AppHost\\Api.AppHost.csproj",
-      "packagesPath": "C:\\Users\\42079\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\42079\\Source\\Repos\\AIHackatonBackEnd\\Api\\Api.AppHost\\obj\\",
+      "projectPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\Api\\Api.AppHost\\Api.AppHost.csproj",
+      "packagesPath": "C:\\Users\\jirim\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jirim\\source\\repos\\Jirka7521\\AIHackatonBackEnd\\Api\\Api.AppHost\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\42079\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jirim\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2926,6 +2926,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2950,7 +2951,7 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
-          "Aspire.Dashboard.Sdk.win-x64": {
+          "Aspire.Dashboard.Sdk.win-arm64": {
             "target": "Package",
             "version": "[9.0.0, )",
             "autoReferenced": true
@@ -2959,7 +2960,7 @@
             "target": "Package",
             "version": "[9.0.0, )"
           },
-          "Aspire.Hosting.Orchestration.win-x64": {
+          "Aspire.Hosting.Orchestration.win-arm64": {
             "target": "Package",
             "version": "[9.0.0, )",
             "autoReferenced": true
