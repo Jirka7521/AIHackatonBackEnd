@@ -1,87 +1,78 @@
 using Microsoft.AspNetCore.Mvc;
+using LLM.Services;
+using LLM.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("chats")]
+    [Route("api/chats")]
     public class ChatController : ControllerBase
     {
-        private static readonly List<Chat> _chats = new();
+        private readonly IChatService _chatService;
+        private readonly ILogger<ChatController> _logger;
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Chat>> GetChats()
+        public ChatController(IChatService chatService, ILogger<ChatController> logger)
         {
-            return Ok(_chats);
+            _chatService = chatService;
+            _logger = logger;
+        }
+
+        [HttpGet("workspace/{workspaceId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<Chat>>>> GetChatsByWorkspace(string workspaceId)
+        {
+            var chats = await _chatService.GetChatsByWorkspaceIdAsync(workspaceId);
+            return Ok(ApiResponse<IEnumerable<Chat>>.SuccessResponse(chats));
         }
 
         [HttpPost]
-        public ActionResult<Chat> CreateChat([FromBody] CreateChatPayload payload)
+        public async Task<ActionResult<ApiResponse<Chat>>> CreateChat([FromBody] CreateChatPayload payload)
         {
-            if (_chats.Any(c => c.Name == payload.Name))
-            {
-                return Conflict(new ChatNameAlreadyExistsError { Name = payload.Name });
-            }
-
-            var chat = new Chat
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = payload.Name,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _chats.Add(chat);
-            return Ok(chat);
+            var chat = await _chatService.CreateChatAsync(payload);
+            return CreatedAtAction(nameof(GetChat), new { id = chat.Id }, 
+                ApiResponse<Chat>.SuccessResponse(chat, "Chat created successfully"));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Chat> GetChat(string id)
+        public async Task<ActionResult<ApiResponse<Chat>>> GetChat(string id)
         {
-            var chat = _chats.FirstOrDefault(c => c.Id == id);
+            var chat = await _chatService.GetChatByIdAsync(id);
             if (chat == null)
             {
-                return NotFound();
+                return NotFound(ApiResponse<Chat>.ErrorResponse("Chat not found"));
             }
 
-            return Ok(chat);
+            return Ok(ApiResponse<Chat>.SuccessResponse(chat));
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Chat> UpdateChat(string id, [FromBody] UpdateChatPayload payload)
+        public async Task<ActionResult<ApiResponse<Chat>>> UpdateChat(string id, [FromBody] UpdateChatPayload payload)
         {
-            var chat = _chats.FirstOrDefault(c => c.Id == id);
+            var chat = await _chatService.UpdateChatAsync(id, payload.Name);
             if (chat == null)
             {
-                return NotFound();
+                return NotFound(ApiResponse<Chat>.ErrorResponse("Chat not found"));
             }
 
-            if (_chats.Any(c => c.Name == payload.Name && c.Id != id))
-            {
-                return Conflict(new ChatNameAlreadyExistsError { Name = payload.Name });
-            }
-
-            chat.Name = payload.Name;
-            chat.UpdatedAt = DateTime.UtcNow;
-
-            return Ok(chat);
+            return Ok(ApiResponse<Chat>.SuccessResponse(chat, "Chat updated successfully"));
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteChat(string id)
+        public async Task<ActionResult<ApiResponse<object>>> DeleteChat(string id)
         {
-            var chat = _chats.FirstOrDefault(c => c.Id == id);
-            if (chat == null)
+            var deleted = await _chatService.DeleteChatAsync(id);
+            if (!deleted)
             {
-                return NotFound();
+                return NotFound(ApiResponse<object>.ErrorResponse("Chat not found"));
             }
 
-            _chats.Remove(chat);
-            return NoContent();
+            return Ok(ApiResponse<object>.SuccessResponse(null, "Chat deleted successfully"));
         }
     }
 
     public class UpdateChatPayload
     {
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
     }
 } 

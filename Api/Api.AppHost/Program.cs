@@ -1,13 +1,47 @@
 using LLM.Data;
 using LLM.Services;
+using LLM.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // Customize model validation behavior
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .SelectMany(x => x.Value!.Errors.Select(e => new { Field = x.Key, Message = e.ErrorMessage }))
+                .ToList();
+            
+            return new BadRequestObjectResult(new { Success = false, Message = "Validation failed", Errors = errors });
+        };
+    });
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "LLM API", 
+        Version = "v1",
+        Description = "API for managing workspaces, chats, messages, and attachments"
+    });
+});
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Add Entity Framework
 builder.Services.AddDbContext<LLMDbContext>(options =>
@@ -28,7 +62,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Add global exception handling
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
 
