@@ -180,3 +180,16 @@ C:/Users/jirim/source/repos/Jirka7521/AIHackatonBackEnd/Api/Api.AppHost/obj/Debu
 /Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/obj/Debug/net9.0/Api.AppHost.pdb
 /Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/obj/Debug/net9.0/Api.AppHost.genruntimeconfig.cache
 /Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/obj/Debug/net9.0/ref/Api.AppHost.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/Azure.AI.OpenAI.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/Azure.Core.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/Microsoft.Extensions.AI.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/Microsoft.Extensions.AI.Abstractions.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/Microsoft.Extensions.AI.OpenAI.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/OpenAI.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/System.ClientModel.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/System.Memory.Data.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/UglyToad.PdfPig.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/UglyToad.PdfPig.Core.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/UglyToad.PdfPig.Fonts.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/UglyToad.PdfPig.Tokenization.dll
+/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/bin/Debug/net9.0/UglyToad.PdfPig.Tokens.dll

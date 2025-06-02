@@ -1,30 +1,31 @@
 using Azure;
 using Azure.AI.OpenAI;
-using Microsoft.Extensions.AI;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 using LLM.Data;
 using LLM.Models;
+using OpenAI.Embeddings;
+using OpenAI.Chat;
 
 namespace LLM.Services;
 
 public class AiService : IAiService
 {
     private readonly LLMDbContext _context;
-    private readonly IEmbeddingGenerator<string, Embedding<float>> _embeddingGenerator;
-    private readonly IChatClient _chatClient;
+    private readonly EmbeddingClient _embeddingClient;
+    private readonly ChatClient _chatClient;
     private readonly ILogger<AiService> _logger;
 
     public AiService(
         LLMDbContext context,
-        IEmbeddingGenerator<string, Embedding<float>> embeddingGenerator,
-        IChatClient chatClient,
+        EmbeddingClient embeddingClient,
+        ChatClient chatClient,
         ILogger<AiService> logger)
     {
         _context = context;
-        _embeddingGenerator = embeddingGenerator;
+        _embeddingClient = embeddingClient;
         _chatClient = chatClient;
         _logger = logger;
     }
@@ -83,7 +84,8 @@ public class AiService : IAiService
                 if (existingVector == null)
                 {
                     // Generate vector for current chunk
-                    ReadOnlyMemory<float> vector = await _embeddingGenerator.GenerateVectorAsync(chunk);
+                    var embeddingResponse = await _embeddingClient.GenerateEmbeddingAsync(chunk);
+                    ReadOnlyMemory<float> vector = embeddingResponse.Value.ToFloats();
 
                     var vectorRecord = new VectorRecord
                     {
@@ -129,7 +131,8 @@ public class AiService : IAiService
         try
         {
             // Generate vector for the query
-            ReadOnlyMemory<float> queryVector = await _embeddingGenerator.GenerateVectorAsync(query);
+            var queryEmbeddingResponse = await _embeddingClient.GenerateEmbeddingAsync(query);
+            ReadOnlyMemory<float> queryVector = queryEmbeddingResponse.Value.ToFloats();
 
             // Use raw SQL for vector similarity search since EF doesn't support pgvector operations directly
             var results = await _context.VectorRecords
@@ -174,9 +177,9 @@ public class AiService : IAiService
         try
         {
             // Build chat history
-            var chatHistory = new List<Microsoft.Extensions.AI.ChatMessage>
+            var chatHistory = new List<ChatMessage>
             {
-                new Microsoft.Extensions.AI.ChatMessage(ChatRole.System, @"
+                new SystemChatMessage(@"
                 You are a friendly learning assistant dedicated to helping users understand complex topics and acquire new skills.
                 When interacting with users, you should:
                 
@@ -191,18 +194,18 @@ public class AiService : IAiService
             // Add conversation history
             foreach (var historyItem in request.History)
             {
-                var role = historyItem.Role.ToLower() switch
+                ChatMessage message = historyItem.Role.ToLower() switch
                 {
-                    "user" => ChatRole.User,
-                    "assistant" => ChatRole.Assistant,
-                    "system" => ChatRole.System,
-                    _ => ChatRole.User
+                    "user" => new UserChatMessage(historyItem.Content),
+                    "assistant" => new AssistantChatMessage(historyItem.Content),
+                    "system" => new SystemChatMessage(historyItem.Content),
+                    _ => new UserChatMessage(historyItem.Content)
                 };
-                chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(role, historyItem.Content));
+                chatHistory.Add(message);
             }
 
             // Add current user message
-            chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.User, request.Message));
+            chatHistory.Add(new UserChatMessage(request.Message));
 
             // Perform RAG: Query the vector store
             var queryResults = await QueryVectorsAsync(request.Message, 3);
@@ -215,15 +218,15 @@ public class AiService : IAiService
             // Add retrieved info as system context
             if (queryResults.Any())
             {
-                chatHistory.Add(new Microsoft.Extensions.AI.ChatMessage(ChatRole.System, retrievedInfo));
+                chatHistory.Add(new SystemChatMessage(retrievedInfo));
             }
 
             // Get AI response
-            var response = await _chatClient.CompleteAsync(chatHistory);
+            var response = await _chatClient.CompleteChatAsync(chatHistory);
 
             return new AiChatResponse
             {
-                Response = response.Message.Text ?? string.Empty,
+                Response = response.Value.Content[0].Text ?? string.Empty,
                 RetrievedContext = queryResults
             };
         }

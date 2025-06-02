@@ -4,7 +4,9 @@ using LLM.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Azure;
 using Azure.AI.OpenAI;
-using Microsoft.Extensions.AI;
+using Microsoft.AspNetCore.Mvc;
+using OpenAI.Embeddings;
+using OpenAI.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,28 +53,26 @@ builder.Services.AddDbContext<LLMDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Azure OpenAI services
-builder.Services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(serviceProvider =>
+builder.Services.AddSingleton<EmbeddingClient>(serviceProvider =>
 {
     var config = serviceProvider.GetRequiredService<IConfiguration>();
     string vectorEndpoint = config["AzureOpenAIVector:Endpoint"]!;
     string vectorModel = config["AzureOpenAIVector:Model"]!;
     string vectorApiKey = config["AzureOpenAIVector:ApiKey"]!;
 
-    return new AzureOpenAIClient(new Uri(vectorEndpoint), new AzureKeyCredential(vectorApiKey))
-        .GetEmbeddingClient(deploymentName: vectorModel)
-        .AsIEmbeddingGenerator();
+    var azureClient = new AzureOpenAIClient(new Uri(vectorEndpoint), new AzureKeyCredential(vectorApiKey));
+    return azureClient.GetEmbeddingClient(deploymentName: vectorModel);
 });
 
-builder.Services.AddSingleton<IChatClient>(serviceProvider =>
+builder.Services.AddSingleton<ChatClient>(serviceProvider =>
 {
     var config = serviceProvider.GetRequiredService<IConfiguration>();
     string endpoint = config["AzureOpenAILLM:Endpoint"]!;
     string deployment = config["AzureOpenAILLM:Deployment"]!;
     string apiKey = config["AzureOpenAILLM:ApiKey"]!;
 
-    return new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey))
-        .GetChatClient(deployment)
-        .AsIChatClient();
+    var azureClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+    return azureClient.GetChatClient(deployment);
 });
 
 // Add Services
@@ -113,17 +113,7 @@ using (var scope = app.Services.CreateScope())
         await context.Database.MigrateAsync();
         logger.LogInformation("Database migrations completed successfully.");
 
-        // Initialize vector tables and extensions
-        try
-        {
-            var postgresService = new PostgresDatabase(context.Database.GetConnectionString()!);
-            await postgresService.EnsureTableExistsAsync();
-            logger.LogInformation("Vector database tables and extensions initialized successfully.");
-        }
-        catch (Exception vectorEx)
-        {
-            logger.LogWarning(vectorEx, "Could not initialize vector database extensions. Vector operations may not work properly.");
-        }
+        logger.LogInformation("Database initialization completed. Vector tables will be created via migrations.");
     }
     catch (Exception ex)
     {

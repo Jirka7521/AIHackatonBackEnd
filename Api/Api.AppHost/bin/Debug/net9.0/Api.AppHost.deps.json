@@ -8,14 +8,49 @@
     ".NETCoreApp,Version=v9.0": {
       "Api.AppHost/1.0.0": {
         "dependencies": {
+          "Azure.AI.OpenAI": "2.1.0",
           "Microsoft.AspNetCore.OpenApi": "9.0.0",
           "Microsoft.EntityFrameworkCore": "9.0.0",
           "Microsoft.EntityFrameworkCore.Design": "9.0.0",
+          "Microsoft.Extensions.AI": "9.0.1-preview.1.24570.5",
+          "Microsoft.Extensions.AI.OpenAI": "9.0.1-preview.1.24570.5",
+          "Npgsql": "9.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.0",
-          "Swashbuckle.AspNetCore": "7.2.0"
+          "Swashbuckle.AspNetCore": "7.2.0",
+          "UglyToad.PdfPig": "1.7.0-custom-5"
         },
         "runtime": {
           "Api.AppHost.dll": {}
+        }
+      },
+      "Azure.AI.OpenAI/2.1.0": {
+        "dependencies": {
+          "Azure.Core": "1.44.1",
+          "OpenAI": "2.1.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Azure.AI.OpenAI.dll": {
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.100.24.60605"
+          }
+        }
+      },
+      "Azure.Core/1.44.1": {
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
+          "System.ClientModel": "1.2.1",
+          "System.Diagnostics.DiagnosticSource": "9.0.0",
+          "System.Memory.Data": "9.0.0",
+          "System.Numerics.Vectors": "4.5.0",
+          "System.Text.Encodings.Web": "6.0.0",
+          "System.Text.Json": "9.0.0",
+          "System.Threading.Tasks.Extensions": "4.5.4"
+        },
+        "runtime": {
+          "lib/net6.0/Azure.Core.dll": {
+            "assemblyVersion": "1.44.1.0",
+            "fileVersion": "1.4400.124.50905"
+          }
         }
       },
       "Humanizer.Core/2.14.1": {
@@ -224,7 +259,7 @@
           "Microsoft.CodeAnalysis.Common": "4.8.0",
           "System.Composition": "7.0.0",
           "System.IO.Pipelines": "7.0.0",
-          "System.Threading.Channels": "7.0.0"
+          "System.Threading.Channels": "9.0.0"
         },
         "runtime": {
           "lib/net7.0/Microsoft.CodeAnalysis.Workspaces.dll": {
@@ -393,6 +428,45 @@
           }
         }
       },
+      "Microsoft.Extensions.AI/9.0.1-preview.1.24570.5": {
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "9.0.1-preview.1.24570.5",
+          "Microsoft.Extensions.Caching.Abstractions": "9.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
+          "System.Diagnostics.DiagnosticSource": "9.0.0",
+          "System.Text.Json": "9.0.0",
+          "System.Threading.Channels": "9.0.0"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.AI.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.124.57005"
+          }
+        }
+      },
+      "Microsoft.Extensions.AI.Abstractions/9.0.1-preview.1.24570.5": {
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.AI.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.124.57005"
+          }
+        }
+      },
+      "Microsoft.Extensions.AI.OpenAI/9.0.1-preview.1.24570.5": {
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "9.0.1-preview.1.24570.5",
+          "OpenAI": "2.1.0",
+          "System.Memory.Data": "9.0.0",
+          "System.Text.Json": "9.0.0"
+        },
+        "runtime": {
+          "lib/net9.0/Microsoft.Extensions.AI.OpenAI.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.124.57005"
+          }
+        }
+      },
       "Microsoft.Extensions.ApiDescription.Server/6.0.5": {},
       "Microsoft.Extensions.Caching.Abstractions/9.0.0": {
         "dependencies": {
@@ -490,6 +564,18 @@
           }
         }
       },
+      "OpenAI/2.1.0": {
+        "dependencies": {
+          "System.ClientModel": "1.2.1",
+          "System.Diagnostics.DiagnosticSource": "9.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/OpenAI.dll": {
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/7.2.0": {
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "6.0.5",
@@ -525,6 +611,18 @@
           "lib/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
             "assemblyVersion": "7.2.0.0",
             "fileVersion": "7.2.0.956"
+          }
+        }
+      },
+      "System.ClientModel/1.2.1": {
+        "dependencies": {
+          "System.Memory.Data": "9.0.0",
+          "System.Text.Json": "9.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/System.ClientModel.dll": {
+            "assemblyVersion": "1.2.1.0",
+            "fileVersion": "1.200.124.50905"
           }
         }
       },
@@ -597,15 +695,89 @@
           }
         }
       },
+      "System.Diagnostics.DiagnosticSource/9.0.0": {},
       "System.IO.Pipelines/7.0.0": {},
+      "System.Memory.Data/9.0.0": {
+        "runtime": {
+          "lib/net9.0/System.Memory.Data.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {},
       "System.Reflection.Metadata/7.0.0": {
         "dependencies": {
           "System.Collections.Immutable": "7.0.0"
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
+      "System.Text.Encodings.Web/6.0.0": {
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
       "System.Text.Json/9.0.0": {},
-      "System.Threading.Channels/7.0.0": {}
+      "System.Threading.Channels/9.0.0": {},
+      "System.Threading.Tasks.Extensions/4.5.4": {},
+      "UglyToad.PdfPig/1.7.0-custom-5": {
+        "dependencies": {
+          "UglyToad.PdfPig.Core": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Fonts": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokenization": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokens": "1.7.0-custom-5"
+        },
+        "runtime": {
+          "lib/net6.0/UglyToad.PdfPig.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          }
+        }
+      },
+      "UglyToad.PdfPig.Core/1.7.0-custom-5": {
+        "runtime": {
+          "lib/net6.0/UglyToad.PdfPig.Core.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          }
+        }
+      },
+      "UglyToad.PdfPig.Fonts/1.7.0-custom-5": {
+        "dependencies": {
+          "UglyToad.PdfPig.Core": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokenization": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokens": "1.7.0-custom-5"
+        },
+        "runtime": {
+          "lib/net6.0/UglyToad.PdfPig.Fonts.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          }
+        }
+      },
+      "UglyToad.PdfPig.Tokenization/1.7.0-custom-5": {
+        "dependencies": {
+          "UglyToad.PdfPig.Core": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokens": "1.7.0-custom-5"
+        },
+        "runtime": {
+          "lib/net6.0/UglyToad.PdfPig.Tokenization.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          }
+        }
+      },
+      "UglyToad.PdfPig.Tokens/1.7.0-custom-5": {
+        "dependencies": {
+          "UglyToad.PdfPig.Core": "1.7.0-custom-5"
+        },
+        "runtime": {
+          "lib/net6.0/UglyToad.PdfPig.Tokens.dll": {
+            "assemblyVersion": "0.1.8.0",
+            "fileVersion": "0.1.8.0"
+          }
+        }
+      }
     }
   },
   "libraries": {
@@ -613,6 +785,20 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Azure.AI.OpenAI/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-doixr3tcsIcdzbzF9NxKt+6U0NKj6aPeOCPYONPsWjyf3gxVndVJAdjPcVdqeR/3vcRHXRgGnGlv+iXx5jMA4g==",
+      "path": "azure.ai.openai/2.1.0",
+      "hashPath": "azure.ai.openai.2.1.0.nupkg.sha512"
+    },
+    "Azure.Core/1.44.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YyznXLQZCregzHvioip07/BkzjuWNXogJEVz9T5W6TwjNr17ax41YGzYMptlo2G10oLCuVPoyva62y0SIRDixg==",
+      "path": "azure.core/1.44.1",
+      "hashPath": "azure.core.1.44.1.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -726,6 +912,27 @@
       "path": "microsoft.entityframeworkcore.relational/9.0.0",
       "hashPath": "microsoft.entityframeworkcore.relational.9.0.0.nupkg.sha512"
     },
+    "Microsoft.Extensions.AI/9.0.1-preview.1.24570.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-J38WKNCFGAFhFrUPSHfgaRl593/guj9jAIvD7LS9VUdP3kh15kTSA2tJgQFubWpItPnmESDLtkggOEFu6AKEYw==",
+      "path": "microsoft.extensions.ai/9.0.1-preview.1.24570.5",
+      "hashPath": "microsoft.extensions.ai.9.0.1-preview.1.24570.5.nupkg.sha512"
+    },
+    "Microsoft.Extensions.AI.Abstractions/9.0.1-preview.1.24570.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zqUK1epXT+mxmJW7bonO2gRuYEhysLGIGCbPVXW5qmgYA+8PgFle9IPeKpb9RevwxnEedXdHm+nQyQiOnZIHWg==",
+      "path": "microsoft.extensions.ai.abstractions/9.0.1-preview.1.24570.5",
+      "hashPath": "microsoft.extensions.ai.abstractions.9.0.1-preview.1.24570.5.nupkg.sha512"
+    },
+    "Microsoft.Extensions.AI.OpenAI/9.0.1-preview.1.24570.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ysYX0124k5QdW2F9KGpqFjATE6SOQZx55lDOIsNXMrz+0NyAJVRuQfaV1WNTGslKgUP0QL/kfeRz/oMqqM+Urw==",
+      "path": "microsoft.extensions.ai.openai/9.0.1-preview.1.24570.5",
+      "hashPath": "microsoft.extensions.ai.openai.9.0.1-preview.1.24570.5.nupkg.sha512"
+    },
     "Microsoft.Extensions.ApiDescription.Server/6.0.5": {
       "type": "package",
       "serviceable": true,
@@ -831,6 +1038,13 @@
       "path": "npgsql.entityframeworkcore.postgresql/9.0.0",
       "hashPath": "npgsql.entityframeworkcore.postgresql.9.0.0.nupkg.sha512"
     },
+    "OpenAI/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zl72nyP4O94ZyEoCLoE8qoc5vp8kSJmRuqR+UdK+jNIjFJGWJYjsb4rAGpMWWRTbPYuk82E8myMJdVQurMLDnQ==",
+      "path": "openai/2.1.0",
+      "hashPath": "openai.2.1.0.nupkg.sha512"
+    },
     "Swashbuckle.AspNetCore/7.2.0": {
       "type": "package",
       "serviceable": true,
@@ -858,6 +1072,13 @@
       "sha512": "sha512-hgrXeKzyp5OGN8qVvL7A+vhmU7mDJTfGpiMBRL66IcfLOyna8UTLtn3cC3CghamXpRDufcc9ciklTszUGEQK0w==",
       "path": "swashbuckle.aspnetcore.swaggerui/7.2.0",
       "hashPath": "swashbuckle.aspnetcore.swaggerui.7.2.0.nupkg.sha512"
+    },
+    "System.ClientModel/1.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-s9+M5El+DXdCRRLzxak8uGBKWT8H/eIssGpFtpaMKdJULrQbBDPH/zFbVyHX+NDczhS5EvjHFbBH9/L+0UhmcA==",
+      "path": "system.clientmodel/1.2.1",
+      "hashPath": "system.clientmodel.1.2.1.nupkg.sha512"
     },
     "System.CodeDom/6.0.0": {
       "type": "package",
@@ -915,12 +1136,33 @@
       "path": "system.composition.typedparts/7.0.0",
       "hashPath": "system.composition.typedparts.7.0.0.nupkg.sha512"
     },
+    "System.Diagnostics.DiagnosticSource/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ddppcFpnbohLWdYKr/ZeLZHmmI+DXFgZ3Snq+/E7SwcdW4UnvxmaugkwGywvGVWkHPGCSZjCP+MLzu23AL5SDw==",
+      "path": "system.diagnostics.diagnosticsource/9.0.0",
+      "hashPath": "system.diagnostics.diagnosticsource.9.0.0.nupkg.sha512"
+    },
     "System.IO.Pipelines/7.0.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-jRn6JYnNPW6xgQazROBLSfpdoczRw694vO5kKvMcNnpXuolEixUyw6IBuBs2Y2mlSX/LdLvyyWmfXhaI3ND1Yg==",
       "path": "system.io.pipelines/7.0.0",
       "hashPath": "system.io.pipelines.7.0.0.nupkg.sha512"
+    },
+    "System.Memory.Data/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CxUGXLXdbG7hxdQCRdxQKwq//OtYfxKsKyy6oYjSr9zpSvza5rW9TxokNasSLfmETRKDTfu1zqW8RQKokyKw/Q==",
+      "path": "system.memory.data/9.0.0",
+      "hashPath": "system.memory.data.9.0.0.nupkg.sha512"
+    },
+    "System.Numerics.Vectors/4.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
+      "path": "system.numerics.vectors/4.5.0",
+      "hashPath": "system.numerics.vectors.4.5.0.nupkg.sha512"
     },
     "System.Reflection.Metadata/7.0.0": {
       "type": "package",
@@ -936,6 +1178,13 @@
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
+    "System.Text.Encodings.Web/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Vg8eB5Tawm1IFqj4TVK1czJX89rhFxJo9ELqc/Eiq0eXy13RK00eubyU6TJE6y+GQXjyV5gSfiewDUZjQgSE0w==",
+      "path": "system.text.encodings.web/6.0.0",
+      "hashPath": "system.text.encodings.web.6.0.0.nupkg.sha512"
+    },
     "System.Text.Json/9.0.0": {
       "type": "package",
       "serviceable": true,
@@ -943,12 +1192,54 @@
       "path": "system.text.json/9.0.0",
       "hashPath": "system.text.json.9.0.0.nupkg.sha512"
     },
-    "System.Threading.Channels/7.0.0": {
+    "System.Threading.Channels/9.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qmeeYNROMsONF6ndEZcIQ+VxR4Q/TX/7uIVLJqtwIWL7dDWeh0l1UIqgo4wYyjG//5lUNhwkLDSFl+pAWO6oiA==",
-      "path": "system.threading.channels/7.0.0",
-      "hashPath": "system.threading.channels.7.0.0.nupkg.sha512"
+      "sha512": "sha512-hzACdIf1C+4Dqos5ijV404b94+LqfIC8nfS3mNpCDFWowb1N3PNfJPopneq32ahWlDeyaPZJqjBk76YFR69Rpg==",
+      "path": "system.threading.channels/9.0.0",
+      "hashPath": "system.threading.channels.9.0.0.nupkg.sha512"
+    },
+    "System.Threading.Tasks.Extensions/4.5.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zteT+G8xuGu6mS+mzDzYXbzS7rd3K6Fjb9RiZlYlJPam2/hU7JCBZBVEcywNuR+oZ1ncTvc/cq0faRr3P01OVg==",
+      "path": "system.threading.tasks.extensions/4.5.4",
+      "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    },
+    "UglyToad.PdfPig/1.7.0-custom-5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-mddnoBg+XV5YZJg+lp/LlXQ9NY9/oV/MoNjLbbLHw0uTymfyuinVePQB4ff/ELRv3s6n0G7h8q3Ycb3KYg+hgQ==",
+      "path": "uglytoad.pdfpig/1.7.0-custom-5",
+      "hashPath": "uglytoad.pdfpig.1.7.0-custom-5.nupkg.sha512"
+    },
+    "UglyToad.PdfPig.Core/1.7.0-custom-5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bChQUAYApM6/vgBis0+fBTZyAVqjXdqshjZDCgI3dgwUplfLJxXRrnkCOdNj0a6JNcF32R4aLpnGpTc9QmmVmg==",
+      "path": "uglytoad.pdfpig.core/1.7.0-custom-5",
+      "hashPath": "uglytoad.pdfpig.core.1.7.0-custom-5.nupkg.sha512"
+    },
+    "UglyToad.PdfPig.Fonts/1.7.0-custom-5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Z6SBBAIL8wRkJNhXGYaz0CrHnNrNeuNtmwRbBtQUA1b3TDhRQppOmHCIuhjb6Vu/Rirp6FIOtzAU1lXsGik90w==",
+      "path": "uglytoad.pdfpig.fonts/1.7.0-custom-5",
+      "hashPath": "uglytoad.pdfpig.fonts.1.7.0-custom-5.nupkg.sha512"
+    },
+    "UglyToad.PdfPig.Tokenization/1.7.0-custom-5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U8VVH7VJjv6czP7qWyzDq6CRaiJQe7/sESUCL8H3kiEa3zi0l9TonIKlD/YidQ5DlgTumracii6zjLyKPEFKwA==",
+      "path": "uglytoad.pdfpig.tokenization/1.7.0-custom-5",
+      "hashPath": "uglytoad.pdfpig.tokenization.1.7.0-custom-5.nupkg.sha512"
+    },
+    "UglyToad.PdfPig.Tokens/1.7.0-custom-5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-m/j5RVfL4eF/OwX6ASprzK+yzD3l7xdgQ7zQPgENhjxfuXD+hj6FSeZlmxSTt9ywvWcTCjGKAILl9XTK9iQgCQ==",
+      "path": "uglytoad.pdfpig.tokens/1.7.0-custom-5",
+      "hashPath": "uglytoad.pdfpig.tokens.1.7.0-custom-5.nupkg.sha512"
     }
   }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using LLM;
 
 namespace LLM.Controllers
 {
@@ -159,7 +160,7 @@ namespace LLM.Controllers
 
     public class UpdateAttachmentPayload
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public AttachmentStatus? Status { get; set; }
         public Uri? PreviewUrl { get; set; }
     }

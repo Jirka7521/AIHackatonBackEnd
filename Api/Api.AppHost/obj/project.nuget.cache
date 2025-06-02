@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Dq/tZqWM+gI=",
+  "dgSpecHash": "tE425V+JhoU=",
   "success": true,
   "projectFilePath": "/Users/ramare/Developer/personal/AIHackatonBackEnd/Api/Api.AppHost/Api.AppHost.csproj",
   "expectedPackageFiles": [
@@ -64,62 +64,11 @@
     "/Users/ramare/.nuget/packages/system.text.json/9.0.0/system.text.json.9.0.0.nupkg.sha512",
     "/Users/ramare/.nuget/packages/system.threading.channels/9.0.0/system.threading.channels.9.0.0.nupkg.sha512",
     "/Users/ramare/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "/Users/ramare/.nuget/packages/uglytoad.pdfpig/0.1.9-alpha001-patch1/uglytoad.pdfpig.0.1.9-alpha001-patch1.nupkg.sha512",
+    "/Users/ramare/.nuget/packages/uglytoad.pdfpig/1.7.0-custom-5/uglytoad.pdfpig.1.7.0-custom-5.nupkg.sha512",
     "/Users/ramare/.nuget/packages/uglytoad.pdfpig.core/1.7.0-custom-5/uglytoad.pdfpig.core.1.7.0-custom-5.nupkg.sha512",
     "/Users/ramare/.nuget/packages/uglytoad.pdfpig.fonts/1.7.0-custom-5/uglytoad.pdfpig.fonts.1.7.0-custom-5.nupkg.sha512",
     "/Users/ramare/.nuget/packages/uglytoad.pdfpig.tokenization/1.7.0-custom-5/uglytoad.pdfpig.tokenization.1.7.0-custom-5.nupkg.sha512",
     "/Users/ramare/.nuget/packages/uglytoad.pdfpig.tokens/1.7.0-custom-5/uglytoad.pdfpig.tokens.1.7.0-custom-5.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Api.AppHost depends on UglyToad.PdfPig (>= 0.1.9-alpha.20240518.3) but UglyToad.PdfPig 0.1.9-alpha.20240518.3 was not found. UglyToad.PdfPig 0.1.9-alpha001-patch1 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Core (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Core 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Core 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Core",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Fonts (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Fonts 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Fonts 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Fonts",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Tokenization (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Tokenization 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Tokenization 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Tokenization",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Tokens (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Tokens 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Tokens 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Tokens",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  "logs": []
 }

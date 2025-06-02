@@ -1235,13 +1235,13 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
-      "UglyToad.PdfPig/0.1.9-alpha001-patch1": {
+      "UglyToad.PdfPig/1.7.0-custom-5": {
         "type": "package",
         "dependencies": {
-          "UglyToad.PdfPig.Core": "0.1.9-alpha001-patch1",
-          "UglyToad.PdfPig.Fonts": "0.1.9-alpha001-patch1",
-          "UglyToad.PdfPig.Tokenization": "0.1.9-alpha001-patch1",
-          "UglyToad.PdfPig.Tokens": "0.1.9-alpha001-patch1"
+          "UglyToad.PdfPig.Core": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Fonts": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokenization": "1.7.0-custom-5",
+          "UglyToad.PdfPig.Tokens": "1.7.0-custom-5"
         },
         "compile": {
           "lib/net6.0/UglyToad.PdfPig.dll": {
@@ -3844,10 +3844,10 @@
         "version.txt"
       ]
     },
-    "UglyToad.PdfPig/0.1.9-alpha001-patch1": {
-      "sha512": "dayc8urhJp129XPTzYQr00wQmbmOxcIVZRqh/lL1Z12qrwN9zRmNFQR92WOQy0y6eSEokfuN0tdOJw1+eQwTaA==",
+    "UglyToad.PdfPig/1.7.0-custom-5": {
+      "sha512": "mddnoBg+XV5YZJg+lp/LlXQ9NY9/oV/MoNjLbbLHw0uTymfyuinVePQB4ff/ELRv3s6n0G7h8q3Ycb3KYg+hgQ==",
       "type": "package",
-      "path": "uglytoad.pdfpig/0.1.9-alpha001-patch1",
+      "path": "uglytoad.pdfpig/1.7.0-custom-5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3867,7 +3867,7 @@
         "lib/net6.0/UglyToad.PdfPig.xml",
         "lib/netstandard2.0/UglyToad.PdfPig.dll",
         "lib/netstandard2.0/UglyToad.PdfPig.xml",
-        "uglytoad.pdfpig.0.1.9-alpha001-patch1.nupkg.sha512",
+        "uglytoad.pdfpig.1.7.0-custom-5.nupkg.sha512",
         "uglytoad.pdfpig.nuspec"
       ]
     },
@@ -4000,7 +4000,7 @@
       "Npgsql >= 9.0.0",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.0",
       "Swashbuckle.AspNetCore >= 7.2.0",
-      "UglyToad.PdfPig >= 0.1.9-alpha.20240518.3"
+      "UglyToad.PdfPig >= 1.7.0-custom-5"
     ]
   },
   "packageFolders": {
@@ -4022,6 +4022,7 @@
         "net9.0"
       ],
       "sources": {
+        "/opt/homebrew/Cellar/dotnet/9.0.5/libexec/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4040,7 +4041,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net9.0": {
@@ -4084,7 +4085,7 @@
           },
           "UglyToad.PdfPig": {
             "target": "Package",
-            "version": "[0.1.9-alpha.20240518.3, )"
+            "version": "[1.7.0-custom-5, )"
           }
         },
         "imports": [
@@ -4106,60 +4107,8 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/Users/ramare/.dotnet/sdk/9.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/9.0.5/libexec/sdk/9.0.106/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Api.AppHost depends on UglyToad.PdfPig (>= 0.1.9-alpha.20240518.3) but UglyToad.PdfPig 0.1.9-alpha.20240518.3 was not found. UglyToad.PdfPig 0.1.9-alpha001-patch1 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Core (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Core 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Core 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Core",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Fonts (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Fonts 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Fonts 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Fonts",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Tokenization (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Tokenization 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Tokenization 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Tokenization",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "UglyToad.PdfPig 0.1.9-alpha001-patch1 depends on UglyToad.PdfPig.Tokens (>= 0.1.9-alpha001-patch1) but UglyToad.PdfPig.Tokens 0.1.9-alpha001-patch1 was not found. UglyToad.PdfPig.Tokens 1.7.0-custom-5 was resolved instead.",
-      "libraryId": "UglyToad.PdfPig.Tokens",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  }
 }

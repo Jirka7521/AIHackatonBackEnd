@@ -66,7 +66,7 @@ namespace LLM.Controllers
                 return NotFound(ApiResponse<object>.ErrorResponse("Chat not found"));
             }
 
-            return Ok(ApiResponse<object>.SuccessResponse(null, "Chat deleted successfully"));
+            return Ok(ApiResponse<object>.SuccessResponse(new { }, "Chat deleted successfully"));
         }
     }
 
