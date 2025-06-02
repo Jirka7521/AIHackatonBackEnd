@@ -1,87 +1,124 @@
 using Microsoft.AspNetCore.Mvc;
+using LLM.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class WorkspaceController : ControllerBase
     {
-        private static readonly List<Workspace> _workspaces = new();
+        private readonly IWorkspaceService _workspaceService;
+        private readonly ILogger<WorkspaceController> _logger;
+
+        public WorkspaceController(IWorkspaceService workspaceService, ILogger<WorkspaceController> logger)
+        {
+            _workspaceService = workspaceService;
+            _logger = logger;
+        }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Workspace>> GetWorkspaces()
+        public async Task<ActionResult<IEnumerable<Workspace>>> GetWorkspaces()
         {
-            return Ok(_workspaces);
+            try
+            {
+                var workspaces = await _workspaceService.GetAllWorkspacesAsync();
+                return Ok(workspaces);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving workspaces");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPost]
-        public ActionResult<Workspace> CreateWorkspace([FromBody] CreateWorkspacePayload payload)
+        public async Task<ActionResult<Workspace>> CreateWorkspace([FromBody] CreateWorkspacePayload payload)
         {
-            if (_workspaces.Any(w => w.Name == payload.Name))
+            try
+            {
+                var workspace = await _workspaceService.CreateWorkspaceAsync(payload);
+                return CreatedAtAction(nameof(GetWorkspace), new { id = workspace.Id }, workspace);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
             {
                 return Conflict(new WorkspaceNameAlreadyExistsError { Name = payload.Name });
             }
-
-            var workspace = new Workspace
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = payload.Name,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _workspaces.Add(workspace);
-            return Ok(workspace);
+                _logger.LogError(ex, "Error creating workspace with name {Name}", payload.Name);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Workspace> GetWorkspace(string id)
+        public async Task<ActionResult<Workspace>> GetWorkspace(string id)
         {
-            var workspace = _workspaces.FirstOrDefault(w => w.Id == id);
-            if (workspace == null)
+            try
             {
-                return NotFound();
-            }
+                var workspace = await _workspaceService.GetWorkspaceByIdAsync(id);
+                if (workspace == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(workspace);
+                return Ok(workspace);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving workspace {Id}", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Workspace> UpdateWorkspace(string id, [FromBody] UpdateWorkspacePayload payload)
+        public async Task<ActionResult<Workspace>> UpdateWorkspace(string id, [FromBody] UpdateWorkspacePayload payload)
         {
-            var workspace = _workspaces.FirstOrDefault(w => w.Id == id);
-            if (workspace == null)
+            try
             {
-                return NotFound();
-            }
+                var workspace = await _workspaceService.UpdateWorkspaceAsync(id, payload.Name);
+                if (workspace == null)
+                {
+                    return NotFound();
+                }
 
-            if (_workspaces.Any(w => w.Name == payload.Name && w.Id != id))
+                return Ok(workspace);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("already exists"))
             {
                 return Conflict(new WorkspaceNameAlreadyExistsError { Name = payload.Name });
             }
-
-            workspace.Name = payload.Name;
-            workspace.UpdatedAt = DateTime.UtcNow;
-
-            return Ok(workspace);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating workspace {Id}", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteWorkspace(string id)
+        public async Task<IActionResult> DeleteWorkspace(string id)
         {
-            var workspace = _workspaces.FirstOrDefault(w => w.Id == id);
-            if (workspace == null)
+            try
             {
-                return NotFound();
-            }
+                var deleted = await _workspaceService.DeleteWorkspaceAsync(id);
+                if (!deleted)
+                {
+                    return NotFound();
+                }
 
-            _workspaces.Remove(workspace);
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting workspace {Id}", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 
     public class UpdateWorkspacePayload
     {
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
     }
 } 

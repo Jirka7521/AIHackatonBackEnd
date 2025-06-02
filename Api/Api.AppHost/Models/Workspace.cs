@@ -1,21 +1,33 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LLM
 {
     public class Workspace
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        [Key]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        
+        [Required]
+        [MaxLength(255)]
+        public string Name { get; set; } = string.Empty;
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation properties
+        public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
+        public virtual ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
     }
 
     public class CreateWorkspacePayload
     {
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
     }
 
     public class WorkspaceNameAlreadyExistsError
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Message => $"Workspace '{Name}' already exists";
     }
 }

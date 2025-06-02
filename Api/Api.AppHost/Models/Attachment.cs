@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace LLM
 {
     public enum AttachmentType
@@ -16,23 +19,47 @@ namespace LLM
 
     public class Attachment
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        [Key]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        
+        [Required]
+        [MaxLength(255)]
+        public string Name { get; set; } = string.Empty;
+        
         public Uri? PreviewUrl { get; set; }
+        
+        [Required]
         public AttachmentType Type { get; set; }
-        public AttachmentStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
+        
+        [Required]
+        public AttachmentStatus Status { get; set; } = AttachmentStatus.Uploaded;
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Foreign key
+        [Required]
+        public string WorkspaceId { get; set; } = string.Empty;
+
+        // Navigation property
+        [ForeignKey("WorkspaceId")]
+        public virtual Workspace Workspace { get; set; } = null!;
     }
 
     public class CreateAttachmentPayload
     {
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        
+        [Required]
         public AttachmentType Type { get; set; }
+        
+        [Required]
+        public string WorkspaceId { get; set; } = string.Empty;
     }
 
     public class AttachmentNameAlreadyExistsError
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Message => $"Attachment '{Name}' already exists";
     }
 }
