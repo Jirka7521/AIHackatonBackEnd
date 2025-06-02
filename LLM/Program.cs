@@ -1,4 +1,4 @@
-﻿using Azure.AI.OpenAI;
+﻿﻿using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.AI;
@@ -9,9 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure;
-using Azure.AI.OpenAI.Chat;
-using OpenAI.Chat;
-using ChatMessage = OpenAI.Chat.ChatMessage;
 
 internal class CloudService
 {
@@ -76,14 +73,10 @@ internal class Program
         string endpoint = configuration["AzureOpenAI:Endpoint"];
         string model = configuration["AzureOpenAI:Model"];
         string apiKey = configuration["AzureOpenAI:ApiKey"];
-        
-        
-        // Create openAi client
-        var azureOpenAiClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
         // Create the embedding generator using AzureKeyCredential.
         IEmbeddingGenerator<string, Embedding<float>> generator =
-            azureOpenAiClient
+            new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey))
                 .GetEmbeddingClient(deploymentName: model)
                 .AsIEmbeddingGenerator();
 
@@ -100,62 +93,21 @@ internal class Program
         }
 
         // Convert a search query to a vector and search the vector store.
-        string query = "Can you recommend me Azure service to store large documents.";
+        string query = "Can you recomend me Azure service to store large documets.";
         ReadOnlyMemory<float> queryEmbedding = await generator.GenerateVectorAsync(query);
 
         var results = new List<VectorSearchResult<CloudService>>();
-        //TODO Adjust the top parameter
         await foreach (VectorSearchResult<CloudService> result in cloudServicesStore.SearchAsync(queryEmbedding, top: 1))
         {
             results.Add(result);
         }
-        
-        //Maybe consider later
-        //TODO: Use metadata in embedded vectors (if possible) to limit potentially useless results (e.g. Cloud services, programming languages etc.) for vector search
-        //TODO: Think about semantically dividing the desired pdf files. For example chunking by fixed size can cut sentences in half ... 
-        
-        
-        
-        //TODO: Main QUEST - Augment the LLM query with the vector search results
-        
-        //Create LLM client to send an Augmented query
-        //Move the declarations to the top later
-        //TODO: Specify the model name
-        var chatClient = azureOpenAiClient.GetChatClient("gpt-4o-mini");
-        var chatOptions = new ChatCompletionOptions
-        {
-            //TODO: Customize accordingly
-            //Temperature how much randomness to allow in the response 
-            Temperature = 0.5f,
-            //Range of tokens considered by the LLM model based on their cumulative probability
-            TopP = 0.95f
-        };
-        
-        
-        //TODO: Get the desired information for LLM model from results object which contains the VectorSearchResults
-        //TODO: Replace the User chat message with actual user query
-        ChatMessage[] chatMessages =
-        {
-            //System message like "You are helpful assistant, respond to user based on following context" etc. ....
-            //TODO: Create system message with the results from vector search
-            ChatMessage.CreateSystemMessage("You are a friendly learning assistant dedicated to helping users understand complex topics and acquire new skills." +
-                                            "When interacting with users, you should:" +
-                                            "1. Ask clarifying questions to better understand the user's learning goals." +
-                                            "2. Provide clear, step-by-step explanations and practical examples." +
-                                            "3. Reference additional resources or data (e.g., information from related databases or processing of vector data) when helpful." +
-                                            "4. Prefer to use provided context and data to enhance your responses." +
-                                            "5. Conclude your responses by asking if there is anything else you can explain or help with. Context: " + results),
-            //User query
-            ChatMessage.CreateUserMessage(query),
-        };
 
-        //Send request to the LLM model based on chat messages and options
-        var chatResult = await chatClient.CompleteChatAsync(chatMessages, chatOptions);
-        //Hopefully works 
-        //TODO: Make it work if doesn't
-        string chatResponse = chatResult.Value.Content[0].Text;
-        
-        Console.WriteLine(chatResponse);
+        foreach (VectorSearchResult<CloudService> result in results)
+        {
+            Console.WriteLine($"Name: {result.Record.Name}");
+            Console.WriteLine($"Description: {result.Record.Description}");
+            Console.WriteLine($"Vector match score: {result.Score}");
+        }
         
     }
 }
