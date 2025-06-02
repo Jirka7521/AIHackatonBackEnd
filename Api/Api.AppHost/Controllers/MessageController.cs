@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("chats/{chatId}/[controller]")]
+    [Route("chats/{chatId}/messages")]
     public class MessageController : ControllerBase
     {
         private static readonly Dictionary<string, List<Message>> _messagesByChat = new();

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/workspaces")]
     public class WorkspaceController : ControllerBase
     {
         private readonly IWorkspaceService _workspaceService;

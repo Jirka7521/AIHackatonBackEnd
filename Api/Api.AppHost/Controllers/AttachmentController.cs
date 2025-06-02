@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("attachments")]
     public class AttachmentController : ControllerBase
     {
         private static readonly List<Attachment> _attachments = new();

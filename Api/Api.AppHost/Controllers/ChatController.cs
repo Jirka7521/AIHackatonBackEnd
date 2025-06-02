@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LLM.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("chats")]
     public class ChatController : ControllerBase
     {
         private static readonly List<Chat> _chats = new();
